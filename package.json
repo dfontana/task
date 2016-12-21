@@ -19,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/dfontana/task/issues"
   },
-  "homepage": "https://github.com/dfontana/task#readme"
+  "homepage": "https://github.com/dfontana/task#readme",
+  "dependencies": {
+    "request": "^2.79.0",
+    "vorpal": "^1.11.4"
+  }
 }
