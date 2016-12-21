@@ -1,0 +1,23 @@
+{
+  "name": "todoist",
+  "version": "1.0.0",
+  "description": "a simple command line utility for reading and writing todoist tasks",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/dfontana/todoist.git"
+  },
+  "keywords": [
+    "todoist",
+    "cli"
+  ],
+  "author": "Dylan Fontana",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dfontana/todoist/issues"
+  },
+  "homepage": "https://github.com/dfontana/todoist#readme"
+}
