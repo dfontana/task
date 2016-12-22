@@ -39,12 +39,33 @@ function todoistAPI() {
      * @param dataProcessor - callback that processes the final task data set 
      */
     this.tasks = function(projid, dataProcessor) {
-        if(projid){
-            //id
-            
-        }else{
-            //all tasks
-        }
+        var payload = {
+            url: entry,
+            form: {
+                token: user.token,
+                sync_token: sync_token,
+                resource_types: '["items"]'
+            }
+        };
+
+        //TODO implement the sync difference API
+        request.post(payload, function(err, httpResponse, body) {
+            if (!err && httpResponse.statusCode == 200) {
+                var parsed = JSON.parse(body);
+                //sync_token = parsed.sync_token;
+                alldata.items = parsed.items;
+                if (projid) {
+                    var filteredItems = alldata.items.filter(function(value){
+                        return value.project_id == projid;
+                    });
+                    dataProcessor(filteredItems);
+                } else {
+                    dataProcessor(alldata.items);
+                }
+            } else {
+                console.log("[items] ERR: " + httpResponse.statusCode + "\n\t" + err + "\n");
+            }
+        });
     };
 }
 

@@ -29,11 +29,11 @@ function projectSelection(volself, cb) {
         for (var key in projects) {
             var obj = {};
             var name = '';
-            for(var i = 1; i < projects[key].indent; i++){
+            for (var i = 1; i < projects[key].indent; i++) {
                 name += ' ';
             }
             name += projects[key].name;
-            obj.name = name;
+            obj.name = vorpal.chalk.green(name);
             obj.value = projects[key];
             obj.short = name;
             projlist.push(obj);
@@ -50,14 +50,11 @@ function projectSelection(volself, cb) {
             message: 'Select a project to view tasks',
             choices: projlist
         }, function(result) {
-            var selectedProject = result.project;
-
-            volself.log(selectedProject);
-
-            if (selectedProject == '.. Cancel') {
+            if (result.project == '.. Cancel') {
+                process.stdout.write("\u001B[2J\u001B[0;0f"); //clear output
                 cb();
             } else {
-                taskSelection(volself, selectedProject.id, cb);
+                taskSelection(volself, result.project.id, cb);
             }
         });
     });
@@ -70,20 +67,28 @@ function taskSelection(volself, projid, cb) {
 
         var tasklist = [];
         for (var key in tasks) {
-            tasklist.push(key);
+            var obj = {};
+            obj.name = tasks[key].content;
+            obj.value = tasks[key];
+            obj.short = tasks[key].content;
+            tasklist.push(obj);
         }
+
+        tasklist.push(new inq.Separator());
         tasklist.push('.. Return to Project List');
         tasklist.push('.. Cancel');
+        tasklist.push(new inq.Separator());
 
         volself.prompt({
-            type: 'rawlist',
+            type: 'list',
             name: 'task',
             message: 'Select a task to perform an action',
             choices: tasklist
         }, function(result) {
             if (result.task == '.. Return to Project List') {
-                projectSelection();
+                projectSelection(volself, cb);
             } else if (result.task == '.. Cancel') {
+                process.stdout.write("\u001B[2J\u001B[0;0f"); //clear output
                 cb();
             } else {
                 //TODO act on selected task
