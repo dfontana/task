@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/dfontana/task#readme",
   "dependencies": {
+    "inquirer": "^2.0.0",
     "request": "^2.79.0",
     "vorpal": "^1.11.4"
   }
