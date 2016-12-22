@@ -62,12 +62,10 @@ function projectSelection(volself, cb) {
             obj.value = projects[key];
             obj.short = name;
             projlist.push(obj);
-
-            volself.log(obj.value);
         }
 
         projlist.push(new inq.Separator());
-        projlist.push('.. Cancel');
+        projlist.push('.. Done');
         projlist.push(new inq.Separator());
 
 
@@ -77,7 +75,7 @@ function projectSelection(volself, cb) {
             message: 'Select a project to view tasks',
             choices: projlist
         }, function(result) {
-            if (result.project == '.. Cancel') {
+            if (result.project == '.. Done') {
                 process.stdout.write("\u001B[2J\u001B[0;0f"); //clear output
                 cb();
             } else {
@@ -103,7 +101,7 @@ function taskSelection(volself, projid, cb) {
 
         tasklist.push(new inq.Separator());
         tasklist.push('.. Return to Project List');
-        tasklist.push('.. Cancel');
+        tasklist.push('.. Done');
         tasklist.push(new inq.Separator());
 
         volself.prompt({
@@ -114,7 +112,7 @@ function taskSelection(volself, projid, cb) {
         }, function(result) {
             if (result.task == '.. Return to Project List') {
                 projectSelection(volself, cb);
-            } else if (result.task == '.. Cancel') {
+            } else if (result.task == '.. Done') {
                 process.stdout.write("\u001B[2J\u001B[0;0f"); //clear output
                 cb();
             } else {
