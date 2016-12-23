@@ -27,7 +27,10 @@ function taskColors() {
     };
 
     this.priorityColor = {
-
+        4: vorpal.chalk.red,
+        3: vorpal.chalk.green,
+        2: vorpal.chalk.magenta,
+        1: vorpal.chalk.blue
     };
 }
 

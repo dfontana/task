@@ -1,11 +1,11 @@
-var vorpal          = require('vorpal')();
-var inq             = require('inquirer');
-var todoistAPI      = require('./todoistAPI');
-var formatter       = require('./taskFormatter');
-var colors          = require('./taskColors');
-var api             = new todoistAPI();
-var taskformatter   = new formatter();
-var taskcolor       = new colors();
+var vorpal = require('vorpal')();
+var inq = require('inquirer');
+var todoistAPI = require('./todoistAPI');
+var formatter = require('./taskFormatter');
+var colors = require('./taskColors');
+var api = new todoistAPI();
+var taskformatter = new formatter();
+var taskcolor = new colors();
 
 var alldata = {};
 
@@ -74,8 +74,8 @@ function taskSelection(volself, projid, cb) {
             var obj = {};
 
             var dateString = taskformatter.parseDate(tasks[key].due_date_utc);
-            var content = taskformatter.parseContent(tasks[key].content);
-            obj.name = content + '     ' + dateString;
+            var content = taskformatter.parseContent(tasks[key].content, dateString);
+            obj.name = taskcolor.priorityColor[tasks[key].priority](content);
             obj.value = tasks[key];
             obj.short = tasks[key].content;
             tasklist.push(obj);
@@ -99,6 +99,7 @@ function taskSelection(volself, projid, cb) {
                 cb();
             } else {
                 //TODO act on selected task
+                //consider a bottom bar to lists available tasks
                 volself.log('Hit endpoint\n');
                 cb();
             }

@@ -35,7 +35,7 @@ function tasktime() {
 
         var nowutc = new Date();
         var offset = nowutc.getTimezoneOffset() * 60 * 1000; //timezone diff in ms
-        
+
         var due = new Date(Date.parse(dateString) - offset);
         var now = new Date(nowutc.getTime() - offset);
 
@@ -70,16 +70,46 @@ function tasktime() {
     /**
      * Returns 50 characters worth of content. If content is longer than 50, truncates to 47 and adds ellipse.
      */
-    this.parseContent = function(contentString) {
+    this.parseContent = function(contentString, dateString) {
         var content = '';
         if (contentString.length < 50) {
             content += contentString;
             content += ' '.repeat(50 - contentString.length);
+            content += '     ' + dateString;
         } else if (contentString.length == 50) {
             content = contentString.slice(0);
+            content += '     ' + dateString;
         } else {
-            content += contentString.substring(0, 47);
-            content += '...';
+            var words = contentString.split(' ');
+            for (var i = 0; i < words.length; i++) {
+                if (words[i].length >= 50) {
+                    words[i] = words[i].substring(0, 46) + '... ';
+                } else {
+                    words[i] = words[i] + ' ';
+                }
+            }
+
+            var firstLine = true;
+            var lineSize = 0;
+            var currentWord = 0;
+            while (currentWord != words.length) {
+                if (lineSize + words[currentWord].length > 50) {
+                    content += ' '.repeat(50 - lineSize);
+
+                    //line done.
+                    if (firstLine) {
+                        content += ('     ' + dateString + '\n    ');
+                    } else {
+                        content += '\n    ';
+                    }
+                    firstLine = false;
+                    lineSize = 2;
+                } else {
+                    //add word
+                    lineSize += words[currentWord].length;
+                    content += words[currentWord++];
+                }
+            }
         }
         return content;
     };
