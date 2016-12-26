@@ -14,7 +14,7 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
   - [x] Colorize output based on priority
   - [ ] Mark tasks completed
   - [ ] Edit tasks (due date, content, project)
-    - [ ] (Later) Implement label usage and display
+    - [ ] Implement label usage and display (Later)
 - [ ] List tasks for next 7 days, today (include overdue)
   - [ ] Implement prompt to 'list' command, asking which view. Alternatively add command line parameter to specify view.
 - [ ] Create a new task
@@ -26,7 +26,7 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
   - [ ] Projects
     - [ ] Add
     - [ ] Delete
-    - [ ] (Later) Edit Name, Color?
+    - [ ] Edit Name, Color (Later)
     - [ ] Labels (later: list, edit, add, delete)
 - [ ] Correct coloring schema to be terminal independent (also fix your personal terminal color scheme at this step...)
 
