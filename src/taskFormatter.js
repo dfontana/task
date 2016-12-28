@@ -67,22 +67,20 @@ function tasktime() {
     /** Returns contentWidth characters worth of content.
      * Runs the given UTC format date string through the date parser, to append to the end of the content string.
      * Then determines content:
-     *      If content is less than contentWidth, pads the content with spaces until it is equal to contentWidth.
-     *      If content is contentWidth, it leaves the content alone.
-     *      If content is greater than contentWidth, it is truncated and an ellipse is added. 
+     *      If content is <= contentWidth, pads the content with spaces until it is equal to contentWidth.
+     *      If content is > contentWidth, it is truncated and an ellipse is added. 
      * The parsed date is then appended to the end before returning.
      */
-    this.parseContent = function(lineWidth, contentString, rawDate) {
+    this.parseContent = function(lineWidth, rawContent, indent, rawDate) {
         var date = '     ' + this.parseDate(rawDate);
-        var contentWidth = lineWidth - date.length;
+        var contentWidth = lineWidth - date.length - indent;
         var content = '';
-        if (contentString.length < contentWidth) {
-            content = contentString;
-            content += ' '.repeat(contentWidth - contentString.length);
-        } else if (contentString.length == contentWidth) {
-            content = contentString.slice(0);
+        content += ' '.repeat(indent);
+        if (rawContent.length <= contentWidth) {
+            content += rawContent;
+            content += ' '.repeat(contentWidth - rawContent.length);
         } else {
-            content = contentString.substring(0,(contentWidth-4))+'... ';
+            content += rawContent.substring(0, (contentWidth - 4)) + '... ';
         }
         content += date;
         return content;

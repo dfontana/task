@@ -27,7 +27,7 @@ function stopWaitingIndicator(intervalId) {
 function projectSelection(volself, cb) {
     var listProjectsIndicator = startWaitingIndicator();
     api.projects(function(projects) {
-        stopWaitingIndicator(listProjectsIndicator); 
+        stopWaitingIndicator(listProjectsIndicator);
 
         var projlist = [];
         for (var key in projects) {
@@ -68,14 +68,19 @@ function taskSelection(volself, projid, cb) {
     var listTaskIndicator = startWaitingIndicator();
     api.tasks(projid, function(tasks) {
         stopWaitingIndicator(listTaskIndicator);
-        
+
         var nodeWidth = process.stdout.columns || 80;
-        var lineWidth = Math.floor(nodeWidth*0.55);
+        var lineWidth = Math.floor(nodeWidth * 0.55);
 
         var tasklist = [];
         for (var key in tasks) {
             var obj = {};
-            var content = taskformatter.parseContent(lineWidth, tasks[key].content, tasks[key].due_date_utc);
+            
+            var content = taskformatter.parseContent(lineWidth,
+                tasks[key].content,
+                tasks[key].indent,
+                tasks[key].due_date_utc);
+            
             obj.name = taskcolor.priorityColor[tasks[key].priority](content);
             obj.value = tasks[key];
             obj.short = tasks[key].content;
