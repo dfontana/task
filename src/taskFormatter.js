@@ -64,15 +64,13 @@ function tasktime() {
     };
 
 
-    /** Returns contentWidth characters worth of content. 
-     * If content is less than contentWidth, pads the content with spaces until it is equal to contentWidth.
-     * If content is contentWidth, it leaves the content alone.
-     * If content is greater than contentWidth, it looks for any words larger than 50 and truncates those to 47 chars
-     * with an ellipse. It then generates a multi-line string, wrapping at the 50 character mark. Lines smaller 
-     * than 50 (because a whole word could not fit) are padded. Successive lines are indented 4 spaces.
-     *
-     * For all cases, at the end of the first line of content 5 spaces are added and then the datestring, bringing
-     * the total line length to 70 characters.
+    /** Returns contentWidth characters worth of content.
+     * Runs the given UTC format date string through the date parser, to append to the end of the content string.
+     * Then determines content:
+     *      If content is less than contentWidth, pads the content with spaces until it is equal to contentWidth.
+     *      If content is contentWidth, it leaves the content alone.
+     *      If content is greater than contentWidth, it is truncated and an ellipse is added. 
+     * The parsed date is then appended to the end before returning.
      */
     this.parseContent = function(lineWidth, contentString, rawDate) {
         var date = '     ' + this.parseDate(rawDate);
