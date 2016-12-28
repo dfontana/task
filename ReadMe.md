@@ -13,7 +13,7 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
   - [ ] Add options: Today, Next 7 (overdue bundled with each)
 - [x] List tasks within a selected project
   - [x] Colorize output based on priority
-  - [ ] Indent sub-tasks like Projects are handled.
+  - [x] Indent sub-tasks like Projects are handled.
   - [ ] Take action on task: complete, edit(project, content, due, indent, order), delete, cancel.
 - [ ] Create a new task
   - [ ] Set project
