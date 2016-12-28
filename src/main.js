@@ -43,6 +43,10 @@ function projectSelection(volself, cb) {
             projlist.push(obj);
         }
 
+        projlist.sort(function(a, b) {
+            return a.value.item_order - b.value.item_order;
+        });
+
         projlist.push(new inq.Separator());
         projlist.push('.. Done');
         projlist.push(new inq.Separator());
