@@ -23,11 +23,8 @@ function tasktime() {
         6: 'Saturday'
     };
 
-    //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa     111111111111111
-
-    /**
-     * Returns 15 characters worth of date. If the date is empty, then it's 15 spaces.
-     */
+    /** Returns 15 characters worth of date. 
+     * If the date is empty, then it's 15 spaces. */
     this.parseDate = function(dateString) {
         if (dateString === null) {
             return ' '.repeat(15);
@@ -67,50 +64,29 @@ function tasktime() {
     };
 
 
-    /**
-     * Returns 50 characters worth of content. If content is longer than 50, truncates to 47 and adds ellipse.
+    /** Returns contentWidth characters worth of content. 
+     * If content is less than contentWidth, pads the content with spaces until it is equal to contentWidth.
+     * If content is contentWidth, it leaves the content alone.
+     * If content is greater than contentWidth, it looks for any words larger than 50 and truncates those to 47 chars
+     * with an ellipse. It then generates a multi-line string, wrapping at the 50 character mark. Lines smaller 
+     * than 50 (because a whole word could not fit) are padded. Successive lines are indented 4 spaces.
+     *
+     * For all cases, at the end of the first line of content 5 spaces are added and then the datestring, bringing
+     * the total line length to 70 characters.
      */
-    this.parseContent = function(contentString, dateString) {
+    this.parseContent = function(lineWidth, contentString, rawDate) {
+        var date = '     ' + this.parseDate(rawDate);
+        var contentWidth = lineWidth - date.length;
         var content = '';
-        if (contentString.length < 50) {
-            content += contentString;
-            content += ' '.repeat(50 - contentString.length);
-            content += '     ' + dateString;
-        } else if (contentString.length == 50) {
+        if (contentString.length < contentWidth) {
+            content = contentString;
+            content += ' '.repeat(contentWidth - contentString.length);
+        } else if (contentString.length == contentWidth) {
             content = contentString.slice(0);
-            content += '     ' + dateString;
         } else {
-            var words = contentString.split(' ');
-            for (var i = 0; i < words.length; i++) {
-                if (words[i].length >= 50) {
-                    words[i] = words[i].substring(0, 46) + '... ';
-                } else {
-                    words[i] = words[i] + ' ';
-                }
-            }
-
-            var firstLine = true;
-            var lineSize = 0;
-            var currentWord = 0;
-            while (currentWord != words.length) {
-                if (lineSize + words[currentWord].length > 50) {
-                    content += ' '.repeat(50 - lineSize);
-
-                    //line done.
-                    if (firstLine) {
-                        content += ('     ' + dateString + '\n    ');
-                    } else {
-                        content += '\n    ';
-                    }
-                    firstLine = false;
-                    lineSize = 2;
-                } else {
-                    //add word
-                    lineSize += words[currentWord].length;
-                    content += words[currentWord++];
-                }
-            }
+            content = contentString.substring(0,(contentWidth-4))+'... ';
         }
+        content += date;
         return content;
     };
 }
