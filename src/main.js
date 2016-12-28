@@ -75,17 +75,20 @@ function taskSelection(volself, projid, cb) {
         var tasklist = [];
         for (var key in tasks) {
             var obj = {};
-            
             var content = taskformatter.parseContent(lineWidth,
                 tasks[key].content,
                 tasks[key].indent,
                 tasks[key].due_date_utc);
-            
+
             obj.name = taskcolor.priorityColor[tasks[key].priority](content);
             obj.value = tasks[key];
             obj.short = tasks[key].content;
             tasklist.push(obj);
         }
+
+        tasklist.sort(function(a, b) {
+            return a.value.item_order - b.value.item_order;
+        });
 
         tasklist.push(new inq.Separator());
         tasklist.push('.. Return to Project List');
