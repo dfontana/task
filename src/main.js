@@ -34,6 +34,7 @@ let projectSelection = (volself) => {
                 stopWaitingIndicator(listProjectsIndicator);
 
                 var projlist = [];
+               
                 for (var key in projects) {
                     var obj = {};
                     var name = '';
@@ -51,6 +52,9 @@ let projectSelection = (volself) => {
                     return a.value.item_order - b.value.item_order;
                 });
 
+                //projlist.unshift(new inq.Separator());
+                //projlist.unshift('Next 7');
+                //projlist.unshift('Today');
                 projlist.push(new inq.Separator());
                 projlist.push('.. Done');
                 projlist.push(new inq.Separator());
@@ -59,6 +63,7 @@ let projectSelection = (volself) => {
                     type: 'list',
                     name: 'project',
                     message: 'Select a project to view tasks',
+                    default: projlist[1],
                     choices: projlist
                 }, function(result) {
                     return resolve(result.project);
@@ -66,7 +71,7 @@ let projectSelection = (volself) => {
 
             })
             .catch((error) => {
-                //TODO reject back to flow loop, to catch and cancel loop there. 
+                reject(error);
             });
     });
 };
@@ -76,7 +81,7 @@ let taskSelection = (volself, projid) => {
     return new Promise((resolve, reject) => {
         var listTaskIndicator = startWaitingIndicator();
 
-        api.tasks(projid)
+        api.projectTasks(projid)
             .then((tasks) => {
                 stopWaitingIndicator(listTaskIndicator);
 
@@ -116,7 +121,7 @@ let taskSelection = (volself, projid) => {
                 });
             })
             .catch((error) => {
-                //TODO reject back to flow loop to catch and cancel.
+                reject(error);
             });
     });
 };
@@ -153,6 +158,9 @@ vorpal
                     } else {
                         displayTasks(project.id);
                     }
+                })
+                .catch((error) => {
+                    //TODO resolve error from failure to obtain projects
                 });
         };
 
@@ -168,6 +176,9 @@ vorpal
                         displayActions(task);
                         cb();
                     }
+                })
+                .catch((error) => {
+                    //TODO resolve error from failure to obtain tasks
                 });
         };
 
@@ -176,6 +187,9 @@ vorpal
                 .then(() => {
                     //TODO fill in this flow logic
                     cb();
+                })
+                .catch((error) => {
+                    //TODO resolve error from failure to take action
                 });
         };
 

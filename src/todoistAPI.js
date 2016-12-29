@@ -38,12 +38,31 @@ function todoistAPI() {
         });
     };
 
+    /** Convinience method. 
+     * Obtains all tasks for the given project id.
+     */
+    this.projectTasks = (projid) => {
+        return this.tasks(function(value){
+            return value.project_id == projid;
+        });
+    };
+
+    /** Convinience method. 
+     * Obtains all tasks for the next 7 days, including overdue. 
+     */
+
+
+    /** Convinience method. 
+     * Obtains all tasks for the current day, including overdue.
+     */
+
+
     /**
-     * Returns all tasks, or optionally if a project id is given, the tasks for that project.
-     * @param projid - id of the project [optional]
+     * Returns all tasks, or optionally just the tasks of the given filter.
+     * @param filter - filter function. [optional]
      * @param dataProcessor - callback that processes the final task data set 
      */
-    this.tasks = (projid) => {
+    this.tasks = (filter) => {
         return new Promise((resolve, reject) => {
             var payload = {
                 url: entry,
@@ -60,10 +79,8 @@ function todoistAPI() {
                     var parsed = JSON.parse(body);
                     //sync_token = parsed.sync_token;
                     alldata.items = parsed.items;
-                    if (projid) {
-                        var filteredItems = alldata.items.filter(function(value) {
-                            return value.project_id == projid;
-                        });
+                    if (filter) {
+                        var filteredItems = alldata.items.filter(filter);
                         resolve(filteredItems);
                     } else {
                         resolve(alldata.items);
