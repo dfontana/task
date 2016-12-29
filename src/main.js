@@ -1,116 +1,6 @@
 var vorpal = require('vorpal')();
-var inq = require('inquirer');
-var api = require('./todoistAPI');
-var formatter = require('./formatter');
-var colorizer = require('./colorizer');
+var select = require('./selection');
 var util = require('./utilities');
-
-/** Returns id of selected project. */
-let projectSelection = (volself) => {
-    return new Promise((resolve, reject) => {
-        var listProjectsIndicator = util.startWaitingIndicator();
-
-        api.projects()
-            .then((projects) => {
-                util.stopWaitingIndicator(listProjectsIndicator);
-
-                var projlist = [];
-
-                for (var key in projects) {
-                    var obj = {};
-                    var name = '';
-                    for (var i = 1; i < projects[key].indent; i++) {
-                        name += ' ';
-                    }
-                    name += projects[key].name;
-                    obj.name = colorizer.project[projects[key].color](name);
-                    obj.value = projects[key];
-                    obj.short = name;
-                    projlist.push(obj);
-                }
-
-                projlist.sort(function(a, b) {
-                    return a.value.item_order - b.value.item_order;
-                });
-
-                projlist.unshift(new inq.Separator());
-                projlist.unshift('Next 7');
-                projlist.unshift('Today');
-                projlist.push(new inq.Separator());
-                projlist.push('.. Done');
-                projlist.push(new inq.Separator());
-
-                volself.prompt({
-                    type: 'list',
-                    name: 'project',
-                    message: 'Select a project to view tasks',
-                    default: projlist[1],
-                    choices: projlist
-                }, function(result) {
-                    return resolve(result.project);
-                });
-
-            })
-            .catch((error) => {
-                reject(error);
-            });
-    });
-};
-
-/** Returns the selected task */
-let taskSelection = (volself, filter, sort) => {
-    return new Promise((resolve, reject) => {
-        var listTaskIndicator = util.startWaitingIndicator();
-
-        api.tasks(filter)
-            .then((tasks) => {
-                util.stopWaitingIndicator(listTaskIndicator);
-
-                var nodeWidth = process.stdout.columns || 80;
-                var lineWidth = Math.floor(nodeWidth * 0.55);
-
-                var tasklist = [];
-                for (var key in tasks) {
-                    var obj = {};
-                    var content = formatter.parseContent(lineWidth,
-                        tasks[key].content,
-                        tasks[key].indent,
-                        tasks[key].due_date_utc);
-                    obj.name = colorizer.priority[tasks[key].priority](content);
-                    obj.value = tasks[key];
-                    obj.short = tasks[key].content;
-                    tasklist.push(obj);
-                } 
-
-                tasklist.sort(sort);
-
-                tasklist.push(new inq.Separator());
-                tasklist.push('.. Return to Project List');
-                tasklist.push('.. Done');
-                tasklist.push(new inq.Separator());
-
-                volself.prompt({
-                    type: 'list',
-                    name: 'task',
-                    message: 'Select a task to perform an action',
-                    choices: tasklist
-                }, function(result) {
-                    return resolve(result.task);
-                });
-            })
-            .catch((error) => {
-                reject(error);
-            });
-    });
-};
-
-/** Takes action on a given task */
-function actionSelection(volself, task) {
-    return new Promise((resolve, reject) => {
-        //TODO fill in this endpoint
-        resolve();
-    });
-}
 
 vorpal
     .delimiter('Task:')
@@ -129,7 +19,7 @@ vorpal
         var volself = this;
 
         let displayProjects = () => {
-            return projectSelection(volself)
+            return select.project(volself)
                 .then((project) => {
                     switch (project) {
                         case '.. Done':
@@ -167,7 +57,7 @@ vorpal
         };
 
         let displayTasks = (filter, sort) => {
-            return taskSelection(volself, filter, sort)
+            return select.task(volself, filter, sort)
                 .then((task) => {
                     if (task == '.. Done') {
                         cb();
@@ -185,7 +75,7 @@ vorpal
         };
 
         let displayActions = (task) => {
-            return actionSelection(volself, task)
+            return select.action(volself, task)
                 .then(() => {
                     //TODO fill in this flow logic
                     cb();
