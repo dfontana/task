@@ -32,3 +32,18 @@ Utilities.compareToNow = function(dateString) {
     //Compare differences in days since Epoch. 
     return Math.trunc(due.getTime() / 86400000) - Math.trunc(now.getTime() / 86400000);
 };
+
+/** Sort function for tasks, by due date and day order.
+ * Returns true if A comes after B.
+ */
+Utilities.sortByDate = function(taskA, taskB) {
+    var Ams = Date.parse(taskA.due_date_utc);
+    var Bms = Date.parse(taskB.due_date_utc);
+
+    if (Ams == Bms) {
+        return taskA.day_order > taskB.day_order;
+    } else {
+        return Ams > Bms;
+    }
+
+};
