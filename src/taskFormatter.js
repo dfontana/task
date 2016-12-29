@@ -12,7 +12,11 @@
  *  If diff <= 7, replace the "3LetterMonth Day" with just the day: Thursay, Friday...
  *  Return the parsed date string
  **/
+
 function tasktime() {
+    var utils = require('./utilities');
+    var util = new utils();
+
     var numToDay = {
         0: 'Sunday',
         1: 'Monday',
@@ -30,14 +34,8 @@ function tasktime() {
             return ' '.repeat(15);
         }
 
-        var nowutc = new Date();
-        var offset = nowutc.getTimezoneOffset() * 60 * 1000; //timezone diff in ms
-
-        var due = new Date(Date.parse(dateString) - offset);
-        var now = new Date(nowutc.getTime() - offset);
-
-        //Compare differences in days since Epoch.
-        var diff = Math.trunc(due.getTime() / 86400000) - Math.trunc(now.getTime() / 86400000);
+        var due = new Date(Date.parse(dateString) - ((new Date()).getTimezoneOffset() * 60 * 1000));
+        var diff = util.compareToNow(dateString); 
         switch (diff) {
             case 0:
                 return 'Today' + ' '.repeat(10);

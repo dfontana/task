@@ -3,9 +3,13 @@ var inq = require('inquirer');
 var todoistAPI = require('./todoistAPI');
 var formatter = require('./taskFormatter');
 var colors = require('./taskColors');
+var utils = require('./utilities');
+
+
 var api = new todoistAPI();
 var taskformatter = new formatter();
 var taskcolor = new colors();
+var util = new utils();
 
 var alldata = {};
 
@@ -34,7 +38,7 @@ let projectSelection = (volself) => {
                 stopWaitingIndicator(listProjectsIndicator);
 
                 var projlist = [];
-               
+
                 for (var key in projects) {
                     var obj = {};
                     var name = '';
@@ -52,9 +56,9 @@ let projectSelection = (volself) => {
                     return a.value.item_order - b.value.item_order;
                 });
 
-                //projlist.unshift(new inq.Separator());
-                //projlist.unshift('Next 7');
-                //projlist.unshift('Today');
+                projlist.unshift(new inq.Separator());
+                projlist.unshift('Next 7');
+                projlist.unshift('Today');
                 projlist.push(new inq.Separator());
                 projlist.push('.. Done');
                 projlist.push(new inq.Separator());
@@ -77,11 +81,11 @@ let projectSelection = (volself) => {
 };
 
 /** Returns the selected task */
-let taskSelection = (volself, projid) => {
+let taskSelection = (volself, filter, sort) => {
     return new Promise((resolve, reject) => {
         var listTaskIndicator = startWaitingIndicator();
 
-        api.projectTasks(projid)
+        api.tasks(filter)
             .then((tasks) => {
                 stopWaitingIndicator(listTaskIndicator);
 
@@ -95,16 +99,13 @@ let taskSelection = (volself, projid) => {
                         tasks[key].content,
                         tasks[key].indent,
                         tasks[key].due_date_utc);
-
                     obj.name = taskcolor.priorityColor[tasks[key].priority](content);
                     obj.value = tasks[key];
                     obj.short = tasks[key].content;
                     tasklist.push(obj);
                 }
 
-                tasklist.sort(function(a, b) {
-                    return a.value.item_order - b.value.item_order;
-                });
+                tasklist.sort(sort);
 
                 tasklist.push(new inq.Separator());
                 tasklist.push('.. Return to Project List');
@@ -153,10 +154,27 @@ vorpal
         let displayProjects = () => {
             return projectSelection(volself)
                 .then((project) => {
-                    if (project == '.. Done') {
-                        cb();
-                    } else {
-                        displayTasks(project.id);
+                    switch (project) {
+                        case '.. Done':
+                            cb();
+                            break;
+                        case 'Today':
+                            displayTasks(filterToday, sortByTimeAndDay);
+                            break;
+                        case 'Next 7':
+                            displayTasks(function(value) {
+                                var diff = util.compareToNow(value.due_date_utc);
+                                return diff < 7;
+                            }, function(a,b){
+                                
+                            });
+                            break;
+                        default:
+                            displayTasks(function(value) {
+                                return value.project_id == project.id;
+                            }, function(a, b) {
+                                return a.value.item_order - b.value.item_order;
+                            });
                     }
                 })
                 .catch((error) => {
@@ -164,8 +182,8 @@ vorpal
                 });
         };
 
-        let displayTasks = (id) => {
-            return taskSelection(volself, id)
+        let displayTasks = (filter, sort) => {
+            return taskSelection(volself, filter, sort)
                 .then((task) => {
                     if (task == '.. Done') {
                         cb();

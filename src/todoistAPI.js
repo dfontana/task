@@ -38,25 +38,6 @@ function todoistAPI() {
         });
     };
 
-    /** Convinience method. 
-     * Obtains all tasks for the given project id.
-     */
-    this.projectTasks = (projid) => {
-        return this.tasks(function(value){
-            return value.project_id == projid;
-        });
-    };
-
-    /** Convinience method. 
-     * Obtains all tasks for the next 7 days, including overdue. 
-     */
-
-
-    /** Convinience method. 
-     * Obtains all tasks for the current day, including overdue.
-     */
-
-
     /**
      * Returns all tasks, or optionally just the tasks of the given filter.
      * @param filter - filter function. [optional]
