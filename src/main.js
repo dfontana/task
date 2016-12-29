@@ -103,7 +103,7 @@ let taskSelection = (volself, filter, sort) => {
                     obj.value = tasks[key];
                     obj.short = tasks[key].content;
                     tasklist.push(obj);
-                }
+                } 
 
                 tasklist.sort(sort);
 
@@ -165,8 +165,15 @@ vorpal
                             displayTasks(function(value) {
                                 var diff = util.compareToNow(value.due_date_utc);
                                 return diff < 7;
-                            }, function(a,b){
-                                
+                            }, function(a, b) {
+                                var Ams = Date.parse(a.value.due_date_utc);
+                                var Bms = Date.parse(b.value.due_date_utc); 
+
+                                if(Ams == Bms){
+                                    return a.value.day_order > b.value.day_order;
+                                }else{
+                                    return Ams > Bms;
+                                }
                             });
                             break;
                         default:
