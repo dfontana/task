@@ -1,0 +1,70 @@
+var util = require('./utilities');
+
+var Formatter = module.exports;
+
+var numToDay = {
+    0: 'Sunday',
+    1: 'Monday',
+    2: 'Tuesday',
+    3: 'Wednesday',
+    4: 'Thursday',
+    5: 'Friday',
+    6: 'Saturday'
+};
+
+/** Returns 15 characters worth of date. 
+ * If the date is empty, then it's 15 spaces. */
+var parseDate = function(dateString) {
+    if (dateString === null) {
+        return ' '.repeat(15);
+    }
+
+    var due = new Date(Date.parse(dateString) - ((new Date()).getTimezoneOffset() * 60 * 1000));
+    var diff = util.compareToNow(dateString);
+    switch (diff) {
+        case 0:
+            return 'Today' + ' '.repeat(10);
+        case 1:
+            return 'Tomorrow' + ' '.repeat(7);
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+            var longstr = numToDay[due.getDay()];
+            longstr += ' '.repeat(15 - longstr.length);
+            return longstr;
+        default:
+            if (diff < 0) {
+                //Overdue
+                return 'Overdue' + ' '.repeat(8);
+            }
+            var abvstr = numToDay[due.getDay()].substring(0, 3);
+            abvstr += ' ' + due.getDate();
+            abvstr += ' '.repeat(15 - abvstr.length);
+            return abvstr;
+    }
+};
+
+
+/** Returns contentWidth characters worth of content.
+ * Runs the given UTC format date string through the date parser, to append to the end of the content string.
+ * Then determines content:
+ *      If content is <= contentWidth, pads the content with spaces until it is equal to contentWidth.
+ *      If content is > contentWidth, it is truncated and an ellipse is added. 
+ * The parsed date is then appended to the end before returning.
+ */
+Formatter.parseContent = function(lineWidth, rawContent, indent, rawDate) {
+    var date = '     ' + parseDate(rawDate);
+    var contentWidth = lineWidth - date.length - indent;
+    var content = '';
+    content += ' '.repeat(indent);
+    if (rawContent.length <= contentWidth) {
+        content += rawContent;
+        content += ' '.repeat(contentWidth - rawContent.length);
+    } else {
+        content += rawContent.substring(0, (contentWidth - 4)) + '... ';
+    }
+    content += date;
+    return content;
+};

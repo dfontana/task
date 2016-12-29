@@ -1,41 +1,18 @@
 var vorpal = require('vorpal')();
 var inq = require('inquirer');
-var todoistAPI = require('./todoistAPI');
-var formatter = require('./taskFormatter');
-var colors = require('./taskColors');
-var utils = require('./utilities');
-
-
-var api = new todoistAPI();
-var taskformatter = new formatter();
-var taskcolor = new colors();
-var util = new utils();
-
-var alldata = {};
-
-function startWaitingIndicator() {
-    var frames = [' ', ' ', '…', '……', '………', '…………', '……………'];
-    var i = 0;
-    var intervalId = setInterval(function() {
-        var frame = frames[i = ++i % frames.length];
-        vorpal.ui.redraw('Hold on …' + frame);
-    }, 250);
-    return intervalId;
-}
-
-function stopWaitingIndicator(intervalId) {
-    clearInterval(intervalId);
-    vorpal.ui.redraw.done();
-}
+var api = require('./todoistAPI');
+var formatter = require('./formatter');
+var colorizer = require('./colorizer');
+var util = require('./utilities');
 
 /** Returns id of selected project. */
 let projectSelection = (volself) => {
     return new Promise((resolve, reject) => {
-        var listProjectsIndicator = startWaitingIndicator();
+        var listProjectsIndicator = util.startWaitingIndicator();
 
         api.projects()
             .then((projects) => {
-                stopWaitingIndicator(listProjectsIndicator);
+                util.stopWaitingIndicator(listProjectsIndicator);
 
                 var projlist = [];
 
@@ -46,7 +23,7 @@ let projectSelection = (volself) => {
                         name += ' ';
                     }
                     name += projects[key].name;
-                    obj.name = taskcolor.colorizeProject[projects[key].color](name);
+                    obj.name = colorizer.project[projects[key].color](name);
                     obj.value = projects[key];
                     obj.short = name;
                     projlist.push(obj);
@@ -83,11 +60,11 @@ let projectSelection = (volself) => {
 /** Returns the selected task */
 let taskSelection = (volself, filter, sort) => {
     return new Promise((resolve, reject) => {
-        var listTaskIndicator = startWaitingIndicator();
+        var listTaskIndicator = util.startWaitingIndicator();
 
         api.tasks(filter)
             .then((tasks) => {
-                stopWaitingIndicator(listTaskIndicator);
+                util.stopWaitingIndicator(listTaskIndicator);
 
                 var nodeWidth = process.stdout.columns || 80;
                 var lineWidth = Math.floor(nodeWidth * 0.55);
@@ -95,11 +72,11 @@ let taskSelection = (volself, filter, sort) => {
                 var tasklist = [];
                 for (var key in tasks) {
                     var obj = {};
-                    var content = taskformatter.parseContent(lineWidth,
+                    var content = formatter.parseContent(lineWidth,
                         tasks[key].content,
                         tasks[key].indent,
                         tasks[key].due_date_utc);
-                    obj.name = taskcolor.priorityColor[tasks[key].priority](content);
+                    obj.name = colorizer.priority[tasks[key].priority](content);
                     obj.value = tasks[key];
                     obj.short = tasks[key].content;
                     tasklist.push(obj);
