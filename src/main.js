@@ -24,100 +24,108 @@ function stopWaitingIndicator(intervalId) {
     vorpal.ui.redraw.done();
 }
 
-function projectSelection(volself, cb) {
-    var listProjectsIndicator = startWaitingIndicator();
-    api.projects(function(projects) {
-        stopWaitingIndicator(listProjectsIndicator);
+/** Returns id of selected project. */
+let projectSelection = (volself) => {
+    return new Promise((resolve, reject) => {
+        var listProjectsIndicator = startWaitingIndicator();
 
-        var projlist = [];
-        for (var key in projects) {
-            var obj = {};
-            var name = '';
-            for (var i = 1; i < projects[key].indent; i++) {
-                name += ' ';
-            }
-            name += projects[key].name;
-            obj.name = taskcolor.colorizeProject[projects[key].color](name);
-            obj.value = projects[key];
-            obj.short = name;
-            projlist.push(obj);
-        }
+        api.projects()
+            .then((projects) => {
+                stopWaitingIndicator(listProjectsIndicator);
 
-        projlist.sort(function(a, b) {
-            return a.value.item_order - b.value.item_order;
-        });
+                var projlist = [];
+                for (var key in projects) {
+                    var obj = {};
+                    var name = '';
+                    for (var i = 1; i < projects[key].indent; i++) {
+                        name += ' ';
+                    }
+                    name += projects[key].name;
+                    obj.name = taskcolor.colorizeProject[projects[key].color](name);
+                    obj.value = projects[key];
+                    obj.short = name;
+                    projlist.push(obj);
+                }
 
-        projlist.push(new inq.Separator());
-        projlist.push('.. Done');
-        projlist.push(new inq.Separator());
+                projlist.sort(function(a, b) {
+                    return a.value.item_order - b.value.item_order;
+                });
 
+                projlist.push(new inq.Separator());
+                projlist.push('.. Done');
+                projlist.push(new inq.Separator());
 
-        volself.prompt({
-            type: 'list',
-            name: 'project',
-            message: 'Select a project to view tasks',
-            choices: projlist
-        }, function(result) {
-            if (result.project == '.. Done') {
-                process.stdout.write("\u001B[2J\u001B[0;0f"); //clear output
-                cb();
-            } else {
-                taskSelection(volself, result.project.id, cb);
-            }
-        });
+                volself.prompt({
+                    type: 'list',
+                    name: 'project',
+                    message: 'Select a project to view tasks',
+                    choices: projlist
+                }, function(result) {
+                    return resolve(result.project);
+                });
+
+            })
+            .catch((error) => {
+                //TODO reject back to flow loop, to catch and cancel loop there. 
+            });
     });
-}
+};
 
-function taskSelection(volself, projid, cb) {
-    var listTaskIndicator = startWaitingIndicator();
-    api.tasks(projid, function(tasks) {
-        stopWaitingIndicator(listTaskIndicator);
+/** Returns the selected task */
+let taskSelection = (volself, projid) => {
+    return new Promise((resolve, reject) => {
+        var listTaskIndicator = startWaitingIndicator();
 
-        var nodeWidth = process.stdout.columns || 80;
-        var lineWidth = Math.floor(nodeWidth * 0.55);
+        api.tasks(projid)
+            .then((tasks) => {
+                stopWaitingIndicator(listTaskIndicator);
 
-        var tasklist = [];
-        for (var key in tasks) {
-            var obj = {};
-            var content = taskformatter.parseContent(lineWidth,
-                tasks[key].content,
-                tasks[key].indent,
-                tasks[key].due_date_utc);
+                var nodeWidth = process.stdout.columns || 80;
+                var lineWidth = Math.floor(nodeWidth * 0.55);
 
-            obj.name = taskcolor.priorityColor[tasks[key].priority](content);
-            obj.value = tasks[key];
-            obj.short = tasks[key].content;
-            tasklist.push(obj);
-        }
+                var tasklist = [];
+                for (var key in tasks) {
+                    var obj = {};
+                    var content = taskformatter.parseContent(lineWidth,
+                        tasks[key].content,
+                        tasks[key].indent,
+                        tasks[key].due_date_utc);
 
-        tasklist.sort(function(a, b) {
-            return a.value.item_order - b.value.item_order;
-        });
+                    obj.name = taskcolor.priorityColor[tasks[key].priority](content);
+                    obj.value = tasks[key];
+                    obj.short = tasks[key].content;
+                    tasklist.push(obj);
+                }
 
-        tasklist.push(new inq.Separator());
-        tasklist.push('.. Return to Project List');
-        tasklist.push('.. Done');
-        tasklist.push(new inq.Separator());
+                tasklist.sort(function(a, b) {
+                    return a.value.item_order - b.value.item_order;
+                });
 
-        volself.prompt({
-            type: 'list',
-            name: 'task',
-            message: 'Select a task to perform an action',
-            choices: tasklist
-        }, function(result) {
-            if (result.task == '.. Return to Project List') {
-                projectSelection(volself, cb);
-            } else if (result.task == '.. Done') {
-                process.stdout.write("\u001B[2J\u001B[0;0f"); //clear output
-                cb();
-            } else {
-                //TODO act on selected task
-                //consider a bottom bar to lists available tasks
-                volself.log('Hit endpoint\n');
-                cb();
-            }
-        });
+                tasklist.push(new inq.Separator());
+                tasklist.push('.. Return to Project List');
+                tasklist.push('.. Done');
+                tasklist.push(new inq.Separator());
 
+                volself.prompt({
+                    type: 'list',
+                    name: 'task',
+                    message: 'Select a task to perform an action',
+                    choices: tasklist
+                }, function(result) {
+                    return resolve(result.task);
+                });
+            })
+            .catch((error) => {
+                //TODO reject back to flow loop to catch and cancel.
+            });
+    });
+};
+
+/** Takes action on a given task */
+function actionSelection(volself, task) {
+    return new Promise((resolve, reject) => {
+        //TODO fill in this endpoint
+        resolve();
     });
 }
 
@@ -136,5 +144,40 @@ vorpal
     .command('list', 'Lists projects')
     .action(function(args, cb) {
         var volself = this;
-        projectSelection(volself, cb);
+
+        let displayProjects = () => {
+            return projectSelection(volself)
+                .then((project) => {
+                    if (project == '.. Done') {
+                        cb();
+                    } else {
+                        displayTasks(project.id);
+                    }
+                });
+        };
+
+        let displayTasks = (id) => {
+            return taskSelection(volself, id)
+                .then((task) => {
+                    if (task == '.. Done') {
+                        cb();
+                    } else if (task == '.. Return to Project List') {
+                        process.stdout.write("\u001B[2J\u001B[0;0f");
+                        displayProjects();
+                    } else {
+                        displayActions(task);
+                        cb();
+                    }
+                });
+        };
+
+        let displayActions = (task) => {
+            return actionSelection(volself, task)
+                .then(() => {
+                    //TODO fill in this flow logic
+                    cb();
+                });
+        };
+
+        displayProjects();
     });

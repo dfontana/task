@@ -10,26 +10,31 @@ function todoistAPI() {
      * Obtains project list from Todoist, afterwhich passing it to the given dataProcessor callback.
      * @param dataProcessor - callback that handles the finalized data set
      */
-    this.projects = function(dataProcessor) {
-        var payload = {
-            url: entry,
-            form: {
-                token: user.token,
-                sync_token: sync_token,
-                resource_types: '["projects"]'
-            }
-        };
+    this.projects = () => {
+        return new Promise((resolve, reject) => {
+            var payload = {
+                url: entry,
+                form: {
+                    token: user.token,
+                    sync_token: sync_token,
+                    resource_types: '["projects"]'
+                }
+            };
 
-        //TODO implement the sync difference API
-        request.post(payload, function(err, httpResponse, body) {
-            if (!err && httpResponse.statusCode == 200) {
-                var parsed = JSON.parse(body);
-                //sync_token = parsed.sync_token;
-                alldata.projects = parsed.projects;
-                dataProcessor(alldata.projects);
-            } else {
-                console.log("[projects] ERR: " + httpResponse.statusCode + "\n\t" + err + "\n");
-            }
+            //TODO implement the sync difference API
+            request.post(payload, function(err, httpResponse, body) {
+                if (!err && httpResponse.statusCode == 200) {
+                    var parsed = JSON.parse(body);
+                    //sync_token = parsed.sync_token;
+                    alldata.projects = parsed.projects;
+                    resolve(alldata.projects);
+                } else {
+                    reject({
+                        "status": httpResponse.statusCode,
+                        "error": err
+                    });
+                }
+            });
         });
     };
 
@@ -38,33 +43,38 @@ function todoistAPI() {
      * @param projid - id of the project [optional]
      * @param dataProcessor - callback that processes the final task data set 
      */
-    this.tasks = function(projid, dataProcessor) {
-        var payload = {
-            url: entry,
-            form: {
-                token: user.token,
-                sync_token: sync_token,
-                resource_types: '["items"]'
-            }
-        };
-
-        //TODO implement the sync difference API
-        request.post(payload, function(err, httpResponse, body) {
-            if (!err && httpResponse.statusCode == 200) {
-                var parsed = JSON.parse(body);
-                //sync_token = parsed.sync_token;
-                alldata.items = parsed.items;
-                if (projid) {
-                    var filteredItems = alldata.items.filter(function(value){
-                        return value.project_id == projid;
-                    });
-                    dataProcessor(filteredItems);
-                } else {
-                    dataProcessor(alldata.items);
+    this.tasks = (projid) => {
+        return new Promise((resolve, reject) => {
+            var payload = {
+                url: entry,
+                form: {
+                    token: user.token,
+                    sync_token: sync_token,
+                    resource_types: '["items"]'
                 }
-            } else {
-                console.log("[items] ERR: " + httpResponse.statusCode + "\n\t" + err + "\n");
-            }
+            };
+
+            //TODO implement the sync difference API
+            request.post(payload, function(err, httpResponse, body) {
+                if (!err && httpResponse.statusCode == 200) {
+                    var parsed = JSON.parse(body);
+                    //sync_token = parsed.sync_token;
+                    alldata.items = parsed.items;
+                    if (projid) {
+                        var filteredItems = alldata.items.filter(function(value) {
+                            return value.project_id == projid;
+                        });
+                        resolve(filteredItems);
+                    } else {
+                        resolve(alldata.items);
+                    }
+                } else {
+                    reject({
+                        "status": httpResponse.statusCode,
+                        "error": err
+                    });
+                }
+            });
         });
     };
 }
