@@ -1,6 +1,7 @@
 var vorpal = require('vorpal')();
 var select = require('./selection');
 var util = require('./utilities');
+var api = require('./todoistAPI');
 
 vorpal
     .delimiter('Task:')
@@ -84,4 +85,26 @@ vorpal
         };
 
         displayProjects();
+    });
+
+vorpal
+    .command('test', 'Development Testing')
+    .action(function(args, cb) {
+        var volself = this;
+
+        select.addTask(volself)
+            .then((answers) => {
+                api.addTask(answers.project.project_id,
+                        answers.date,
+                        answers.priority,
+                        null,
+                        answers.content)
+                    .then(function(){
+                        cb();
+                    })
+                    .catch((error) => {
+                        //TODO display error, then reprompt
+                        volself.log(vorpal.chalk.red('ERROR: ' + error.status + ' - ' + error.error));
+                    });
+            });
     });
