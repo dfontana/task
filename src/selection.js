@@ -138,7 +138,13 @@ Selections.addTask = (volself) => {
             type: 'input',
             name: 'content',
             message: 'Task Content: ',
+            validate: function(input){
+                if(input.trim() === ''){
+                    return false;
+                }
 
+                return true;
+            }
         }, function(result) {
             hash.content = result.content;
         }).then(function() {
