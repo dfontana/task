@@ -51,7 +51,8 @@ vorpal
                     }
                 })
                 .catch((error) => {
-                    //TODO resolve error from failure to obtain projects
+                    volself.log(vorpal.chalk.red("Could not obtain tasks from Todoist, aborting."));
+                    cb();
                 });
         };
 
@@ -69,7 +70,8 @@ vorpal
                     }
                 })
                 .catch((error) => {
-                    //TODO resolve error from failure to obtain tasks
+                    volself.log(vorpal.chalk.red("Could not obtain tasks from Todoist, aborting."));
+                    cb();
                 });
         };
 
@@ -88,23 +90,29 @@ vorpal
     });
 
 vorpal
-    .command('test', 'Development Testing')
+    .command('create', 'Make a task')
     .action(function(args, cb) {
         var volself = this;
 
-        select.addTask(volself)
-            .then((answers) => {
-                api.addTask(answers.project.project_id,
-                        answers.date,
-                        answers.priority,
-                        null,
-                        answers.content)
-                    .then(function(){
-                        cb();
-                    })
-                    .catch((error) => {
-                        //TODO display error, then reprompt
-                        volself.log(vorpal.chalk.red('ERROR: ' + error.status + ' - ' + error.error));
-                    });
-            });
+        let makeTask = () => {
+            select.addTask(volself)
+                .then((answers) => {
+                    api.addTask(answers.project.project_id,
+                            answers.date,
+                            answers.priority,
+                            null,
+                            answers.content)
+                        .then(function() {
+                            volself.log(vorpal.chalk.green('Task added.'));
+                            cb();
+                        })
+                        .catch((error) => {
+                            volself.log(vorpal.chalk.red('ERROR: ' + error.status + ' - ' + error.error));
+                            makeTask();
+                        });
+                });
+
+        };
+
+        makeTask();
     });

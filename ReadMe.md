@@ -16,10 +16,10 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
   - [x] Colorize output based on priority
   - [x] Indent sub-tasks like Projects are handled.
   - [ ] Take action on task: complete, edit(project, content, due, indent, order), delete, cancel.
-- [ ] Create a new task
-  - [ ] Set project
-  - [ ] Set content
-  - [ ] Set due date / time
+- [x] Create a new task
+  - [x] Set project
+  - [x] Set content
+  - [x] Set due date / time
 - [ ] Manage
   - [ ] Projects (Create, edit (name, color, indent, order), delete, ..Go back)
 - [ ] Correct coloring schema to be terminal independent (also fix your personal terminal color scheme at this step...)
