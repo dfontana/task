@@ -137,7 +137,8 @@ Selections.addTask = (volself) => {
         volself.prompt({
             type: 'input',
             name: 'content',
-            message: 'Task Content: '
+            message: 'Task Content: ',
+
         }, function(result) {
             hash.content = result.content;
         }).then(function() {
@@ -201,7 +202,7 @@ Selections.addTask = (volself) => {
                             }, function(result) {
                                 hash.project = result.project;
                             }).then(function() {
-                              resolve(hash); 
+                                resolve(hash);
                             });
                         })
                         .catch((error) => {
@@ -212,71 +213,3 @@ Selections.addTask = (volself) => {
         });
     });
 };
-
-
-
-
-
-
-
-
-/** Prompt for content, or cancel.
- * If cancel, resolve.
- * If not, prompt for content then resolve.
- */
-//Selections.addTaskContent = (volself) => {
-//    return new Promise((resolve, reject) => {
-//        volself.prompt({
-//            type: 'list',
-//            name: 'continue',
-//            message: 'Enter content or cancel?',
-//            choices: ['Enter content', '.. Cancel']
-//        }, function(result) {
-//            if (result == '.. Cancel') {
-//                resolve('.. Cancel');
-//            } else {
-//                volself.prompt({
-//                    type: 'input',
-//                    name: 'content',
-//                    message: 'Enter your task\'s content',
-//                    validate: function(input) {
-//                        return input.length > 0;
-//                    }
-//                }, function(content) {
-//                    resolve(content);
-//                });
-//            }
-//        });
-//    });
-//};
-
-/** Returns which task detail field to enter.
- * Priority, date, label, or project.
- */
-//Selections.addTaskDetails = (volself) => {
-//    return new Promise((resolve, reject) => {
-//        var args = ['Select Project', 'Set Priority', 'Set Date', 'Set Labels'];
-//        args.push(new inq.Seperator());
-//        args.push('.. Done');
-//        args.push('.. Cancel');
-//        args.push(new inq.Seperator());
-
-//        volself.prompt({
-//            type: 'list',
-//            name: 'argument',
-//            message: 'Enter task details. Select Done when ready.',
-//            choices: args
-//        }, function(result) {
-//            resolve(result);
-//        });
-//    });
-//};
-
-/* 1. Prompt for content, it's required and can't be blank (so validate w/ inquierer)
- *      -Allow user to cancel at this stage, which means resolve with '.. Cancel'
- * 2. After result obtained, prompt for args (user chooses which to enter, prompt each one, finish
- *      when user selects '.. Done'
- * 3. api.addTask(project_id, date_string, priority, labels, content)
- *      - .then(resolve()); //All went well with API, so resolve back to flow control
- *      - .catch(reject(error)); //something went wrong, send it back to flow control
- */
