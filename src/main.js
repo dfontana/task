@@ -94,25 +94,23 @@ vorpal
     .action(function(args, cb) {
         var volself = this;
 
-        let makeTask = () => {
-            select.addTask(volself)
-                .then((answers) => {
-                    api.addTask(answers.project.project_id,
-                            answers.date,
-                            answers.priority,
-                            null,
-                            answers.content)
-                        .then(function() {
-                            volself.log(vorpal.chalk.green('Task added.'));
-                            cb();
-                        })
-                        .catch((error) => {
-                            volself.log(vorpal.chalk.red('ERROR: ' + error.status + ' - ' + error.error));
-                            makeTask();
-                        });
-                });
-
-        };
-
-        makeTask();
+        select.addTask(volself)
+            .then((answers) => {
+                api.addTask(answers.project.project_id,
+                        answers.date,
+                        answers.priority,
+                        null,
+                        answers.content)
+                    .then(function() {
+                        volself.log(vorpal.chalk.green('Task added.'));
+                        cb();
+                    })
+                    .catch((error) => {
+                        volself.log(vorpal.chalk.red('ERROR: ' + error.status + ' - ' + error.error));
+                        cb();
+                    });
+            }).catch((error) => {
+                volself.log(vorpal.chalk.red('ERROR: ' + error.status + ' - ' + error.error));
+                cb();
+            });
     });
