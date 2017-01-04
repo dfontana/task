@@ -172,28 +172,30 @@ let obtainDate = (volself, hash) => {
 
 let obtainPriority = (volself, hash) => {
     return new Promise((resolve, reject) => {
+        var priolist = [{
+            name: colorizer.priority[4]('High'),
+            value: 4,
+            short: 'High'
+        }, {
+            name: colorizer.priority[3]('Medium'),
+            value: 3,
+            short: 'Medium'
+        }, {
+            name: colorizer.priority[2]('Low'),
+            value: 2,
+            short: 'Low'
+        }, {
+            name: colorizer.priority[1]('None'),
+            value: 1,
+            short: 'None'
+        }];
+
         volself.prompt({
                 type: 'list',
                 name: 'priority',
-                default: 'None',
                 message: 'Task Priority:',
-                choices: [{
-                    name: colorizer.priority[4]('High'),
-                    value: 4,
-                    short: colorizer.priority[4]('High')
-                }, {
-                    name: colorizer.priority[3]('Medium'),
-                    value: 3,
-                    short: colorizer.priority[3]('Medium')
-                }, {
-                    name: colorizer.priority[2]('Low'),
-                    value: 2,
-                    short: colorizer.priority[2]('Low')
-                }, {
-                    name: colorizer.priority[1]('None'),
-                    value: 1,
-                    short: colorizer.priority[1]('None')
-                }]
+                default: priolist[3],
+                choices: priolist
             },
             function(result) {
                 hash.priority = result.priority;
@@ -208,6 +210,7 @@ let obtainProject = (volself, hash) => {
             .then((projects) => {
                 return formatProjects(projects);
             }).then((projlist) => {
+                projlist.push(new inq.Separator());
                 volself.prompt({
                     type: 'list',
                     name: 'project',
@@ -215,7 +218,6 @@ let obtainProject = (volself, hash) => {
                     default: projlist[1],
                     choices: projlist
                 }, function(result) {
-                    volself.log(result);
                     hash.project = result.project;
                     resolve(hash);
                 });
