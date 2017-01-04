@@ -19,19 +19,29 @@ var parseDate = function(dateString) {
         return ' '.repeat(15);
     }
 
-    var due = new Date(Date.parse(dateString) - ((new Date()).getTimezoneOffset() * 60 * 1000));
-    var diff = util.compareToNow(dateString);
+    var due = new Date(Date.parse(dateString));
+    var diff = util.compareToNow(dateString); 
+    var time = due.toTimeString().substring(0,5);
+    if (due.getHours() == 23 && due.getMinutes() == 59 && due.getSeconds() == 59) {
+        time = ''; //Allday Task
+    }
+
     switch (diff) {
         case 0:
-            return 'Today' + ' '.repeat(10);
+            var today = 'Today' + ' ' + time;
+            today += ' '.repeat(15-today.length);
+            return today;
         case 1:
-            return 'Tomorrow' + ' '.repeat(7);
+            var tomorrow = 'Tomorrow' + ' ' + time;
+            tomorrow += ' '.repeat(15-tomorrow.length);
+            return tomorrow;
         case 2:
         case 3:
         case 4:
         case 5:
         case 6:
             var longstr = numToDay[due.getDay()];
+            longstr += ' '+time;
             longstr += ' '.repeat(15 - longstr.length);
             return longstr;
         default:
@@ -41,6 +51,7 @@ var parseDate = function(dateString) {
             }
             var abvstr = numToDay[due.getDay()].substring(0, 3);
             abvstr += ' ' + due.getDate();
+            abvstr += ' ' + time;
             abvstr += ' '.repeat(15 - abvstr.length);
             return abvstr;
     }
