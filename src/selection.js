@@ -171,69 +171,74 @@ let obtainDate = (volself, hash) => {
 };
 
 let obtainPriority = (volself, hash) => {
-    return new Promise((resolve, reject) => {
-        volself.prompt({
-            type: 'list',
-            name: 'priority',
-            default: 'None',
-            message: 'Task Priority:',
-            choices: ['High', 'Medium', 'Low', 'None'],
-            filter: function(val) {
-                switch (val) {
-                    case 'High':
-                        return (4);
-                    case 'Medium':
-                        return (3);
-                    case 'Low':
-                        return (2);
-                    default:
-                        return (1);
-                }
-            }
-        }, function(result) {
-            hash.priority = result.priority;
-            resolve(hash);
-        });
-    });
-};
-
-let obtainProject = (volself, hash) => {
-    return new Promise((resolve, reject) => {
-        api.projects()
-            .then((projects) => {
-                return formatProjects(projects);
-            }).then((projlist) => {
+        return new Promise((resolve, reject) => {
                 volself.prompt({
-                    type: 'list',
-                    name: 'project',
-                    message: 'Select a project to put task in',
-                    default: projlist[1],
-                    choices: projlist
-                }, function(result) {
-                    hash.project = result.project;
-                    resolve(hash);
+                        type: 'list',
+                        name: 'priority',
+                        default: 'None',
+                        message: 'Task Priority:',
+                        choices: [{
+                                name: colorizer.priority[4]('High'),
+                                value: 4,
+                                short: colorizer.priority[4]('High')
+                            }, {
+                                name: colorizer.priority[3]('Medium'),
+                                value: 3,
+                                short: colorizer.priority[3]('Medium')
+                            }, {
+                                name: colorizer.priority[2]('Low'),
+                                value: 2,
+                                short: colorizer.priority[2]('Low')
+                            }, {
+                                name: colorizer.priority[1]('None'),
+                                value: 1,
+                                short: colorizer.priority[1]('None')
+                            }]
+                        },
+                        function(result) {
+                            hash.priority = result.priority;
+                            resolve(hash);
+                        });
                 });
-            })
-            .catch((error) => {
-                reject(error);
-            });
-    });
-};
+        };
 
-Selections.addTask = (volself) => {
-    return new Promise((resolve, reject) => {
-        var hash = {};
-        obtainContent(volself, hash)
-            .then((contentHash) => {
-                return obtainDate(volself, contentHash);
-            }).then((dateHash) => {
-                return obtainPriority(volself, dateHash);
-            }).then((priorityHash) => {
-                return obtainProject(volself, priorityHash);
-            }).then((finalHash) => {
-                resolve(finalHash);
-            }).catch((error) => {
-                reject(error);
+        let obtainProject = (volself, hash) => {
+            return new Promise((resolve, reject) => {
+                api.projects()
+                    .then((projects) => {
+                        return formatProjects(projects);
+                    }).then((projlist) => {
+                        volself.prompt({
+                            type: 'list',
+                            name: 'project',
+                            message: 'Select a project to put task in',
+                            default: projlist[1],
+                            choices: projlist
+                        }, function(result) {
+                            hash.project = result.project;
+                            resolve(hash);
+                        });
+                    })
+                    .catch((error) => {
+                        reject(error);
+                    });
             });
-    });
-};
+        };
+
+        Selections.addTask = (volself) => {
+            return new Promise((resolve, reject) => {
+                var hash = {};
+                obtainContent(volself, hash)
+                    .then((contentHash) => {
+                        return obtainDate(volself, contentHash);
+                    }).then((dateHash) => {
+                        return obtainPriority(volself, dateHash);
+                    }).then((priorityHash) => {
+                        return obtainProject(volself, priorityHash);
+                    }).then((finalHash) => {
+                        resolve(finalHash);
+                    }).catch((error) => {
+                        reject(error);
+                    });
+            });
+        };
