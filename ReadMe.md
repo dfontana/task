@@ -19,7 +19,7 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
 - [x] Create a new task
   - [x] Set project, content, due date / time
   - [x] Validate content
-  - [ ] Colorize priority selection
+  - [x] Colorize priority selection
 - [ ] Manage
   - [ ] Projects (Create, edit (name, color, indent, order), delete, ..Go back)
 - [ ] Correct coloring schema to be terminal independent (also fix your personal terminal color scheme at this step...)
