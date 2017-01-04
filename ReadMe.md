@@ -11,7 +11,7 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
   - [x] Navigate in and out of projects
   - [x] Colorize output based on project color
   - [x] Add options: Today, Next 7 (overdue bundled with each)
-  - [ ] Display time, not just day. If time is not 11:59, need to list as well. (Wed 02:15pm vs Wednesday vs Wed 15)
+  - [x] Display time, not just day. If time is not 11:59, need to list as well. (Wed 02:15pm vs Wednesday vs Wed 15)
 - [x] List tasks within a selected project
   - [x] Colorize output based on priority
   - [x] Indent sub-tasks like Projects are handled.
