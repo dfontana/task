@@ -143,27 +143,56 @@ TodoistAPI.addTask = (project_id, date_string, priority, labels, content) => {
  * Consumes a task id, marking it complete, and writing to server.
  */
 TodoistAPI.completeTask = (taskID) => {
+    var task_uuid = uuid.v1();
+    var payload = {
+        url: entry,
+        form: {
+            token: user.token,
+            commands: JSON.stringify([{
+                "type": 'item_close',
+                "uuid": task_uuid,
+                "args": {
+                    "id": taskID
+                }
+            }])
+        }
+    };
+    return atomicTaskOp(taskID, payload, task_uuid);
+};
+
+/** Deletes the given taskid.
+ * Writes directly to server.
+ */
+TodoistAPI.deleteTask = (taskID) => {
+    var task_uuid = uuid.v1();
+    var payload = {
+        url: entry,
+        form: {
+            token: user.token,
+            commands: JSON.stringify([{
+                "type": 'item_delete',
+                "uuid": task_uuid,
+                "args": {
+                    "ids": [taskID]
+                }
+            }])
+        }
+    };
+    return atomicTaskOp(taskID, payload, task_uuid);
+};
+
+/** Interal Use. Performs an 'atomic' task operation.
+ * For simple ops that do not require additional computations after
+ * server side command is complete, such as item_delete or item_complete.
+ *
+ * May be replaced in future, be sure to call wrapper functions to 
+ * ensure safe, reliable operation.
+ */
+var atomicTaskOp = (taskID, payload, task_uuid) => {
     return new Promise((resolve, reject) => {
-        var task_uuid = uuid.v1();
-        var payload = {
-            url: entry,
-            form: {
-                token: user.token,
-                commands: JSON.stringify([{
-                    "type": "item_close",
-                    "uuid": task_uuid,
-                    "args": {
-                        "id": taskID,
-                    }
-                }]),
-
-            }
-        };
-
         request.post(payload, function(err, httpResponse, body) {
             if (!err && httpResponse.statusCode == 200) {
                 var parsed = JSON.parse(body);
-
                 if (parsed.sync_status[task_uuid] != 'ok') {
                     reject({
                         "status": parsed.sync_status[task_uuid].error_code,

@@ -83,11 +83,11 @@ vorpal
                         case 0:
                             return api.completeTask(task.id);
                         case 1:
-                            return select.editTask(task);
+                            return select.editTask(volself, task);
                         case 2:
-                            return select.moveTask(task);
+                            return select.moveTask(volself, task);
                         case 3:
-                            return select.deleteTask(task);
+                            return select.deleteTask(volself, task.id);
                     }
                 })
                 .then((resolve) => {

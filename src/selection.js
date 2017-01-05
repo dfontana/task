@@ -6,7 +6,7 @@ var colorizer = require('./colorizer');
 var util = require('./utilities');
 
 
-//============================== LIST TASK ==================================
+//============================== LIST OPTIONS =================================
 /** Generates a sorted, indented, colorized list of projects.
  * Given a data object containing all the projects from the api module.
  */
@@ -133,7 +133,7 @@ Selections.task = (volself, filter, sort) => {
  * - Moving changing order and indentation (prompt to move up/down one, right/left one)
  * - Deleting confirms before deletion.
  */
-Selections.action = (volself, task) => {
+Selections.action = (volself, taskza) => {
     return new Promise((resolve, reject) => {
         var actionlist = [{
             name: "Mark Complete",
@@ -172,7 +172,34 @@ Selections.action = (volself, task) => {
     });
 };
 
-//============================== ADD TASK ===================================
+/** Confirms task deletion.
+ * Prompts user for yes no, when deleting a task is the selected action.
+ * Then performs their requested operation.
+ */
+Selections.deleteTask = (volself, taskID) => {
+    return new Promise((resolve, reject) => {
+        volself.prompt({
+            type: 'confirm',
+            name: 'del',
+            message: 'Are you sure you want to delete this task?',
+            default: false
+        }, function(result) {
+            if(result.del){
+                api.deleteTask(taskID)
+                    .then((result) =>{
+                        return resolve();
+                    })
+                    .catch((error) => {
+                        return reject(error);
+                    });
+            }else{
+                return resolve();
+            }
+        });
+    });
+};
+
+//============================== ADD TASK =====================================
 let obtainContent = (volself, hash) => {
     return new Promise((resolve, reject) => {
         volself.prompt({
@@ -280,3 +307,6 @@ Selections.addTask = (volself) => {
             });
     });
 };
+
+//============================== TASK ACTIONS =================================
+
