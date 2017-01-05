@@ -29,7 +29,7 @@ vorpal
                         case 'Today':
                             displayTasks(function(value) {
                                 var diff = util.compareToNow(value.due_date_utc);
-                                return diff === 0;
+                                return diff <= 0;
                             }, function(a, b) {
                                 return util.sortByDate(a.value, b.value);
                             });
