@@ -59,7 +59,7 @@ vorpal
         let displayTasks = (filter, sort) => {
             return select.task(volself, filter, sort)
                 .then((task) => {
-                    if (task == '.. Done') { 
+                    if (task == '.. Done') {
                         cb();
                     } else if (task == '.. Return to Project List') {
                         process.stdout.write("\u001B[2J\u001B[0;0f");
@@ -81,7 +81,7 @@ vorpal
                         case -1:
                             return Promise.resolve(-1);
                         case 0:
-                            return api.completeTask(task);
+                            return api.completeTask(task.id);
                         case 1:
                             return select.editTask(task);
                         case 2:
@@ -91,7 +91,6 @@ vorpal
                     }
                 })
                 .then((resolve) => {
-                    process.stdout.write("\u001B[2J\u001B[0;0f");
                     displayTasks(filter, sort);
                 })
                 .catch((error) => {

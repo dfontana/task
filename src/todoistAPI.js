@@ -119,13 +119,13 @@ TodoistAPI.addTask = (project_id, date_string, priority, labels, content) => {
         request.post(payload, function(err, httpResponse, body) {
             if (!err && httpResponse.statusCode == 200) {
                 var parsed = JSON.parse(body);
-                
-                if(parsed.sync_status[task_uuid] != 'ok'){ 
+
+                if (parsed.sync_status[task_uuid] != 'ok') {
                     reject({
-                       "status": parsed.sync_status[task_uuid].error_code,
+                        "status": parsed.sync_status[task_uuid].error_code,
                         "error": parsed.sync_status[task_uuid].error
                     });
-                }else{
+                } else {
                     resolve();
                 }
             } else {
@@ -136,5 +136,48 @@ TodoistAPI.addTask = (project_id, date_string, priority, labels, content) => {
             }
         });
 
+    });
+};
+
+/** Marks the given task completed.
+ * Consumes a task id, marking it complete, and writing to server.
+ */
+TodoistAPI.completeTask = (taskID) => {
+    return new Promise((resolve, reject) => {
+        var task_uuid = uuid.v1();
+        var payload = {
+            url: entry,
+            form: {
+                token: user.token,
+                commands: JSON.stringify([{
+                    "type": "item_close",
+                    "uuid": task_uuid,
+                    "args": {
+                        "id": taskID,
+                    }
+                }]),
+
+            }
+        };
+
+        request.post(payload, function(err, httpResponse, body) {
+            if (!err && httpResponse.statusCode == 200) {
+                var parsed = JSON.parse(body);
+
+                if (parsed.sync_status[task_uuid] != 'ok') {
+                    reject({
+                        "status": parsed.sync_status[task_uuid].error_code,
+                        "error": parsed.sync_status[task_uuid].error
+                    });
+                } else {
+                    resolve();
+                }
+            } else {
+                reject({
+                    "status": httpResponse.statusCode,
+                    "error": err
+                });
+            }
+        });
     });
 };
