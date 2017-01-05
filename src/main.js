@@ -70,7 +70,7 @@ vorpal
                     }
                 })
                 .catch((error) => {
-                    volself.log(vorpal.chalk.red("Could not obtain tasks from Todoist, aborting."));
+                    volself.log(vorpal.chalk.red('Error '+error.status+': '+error.error));
                     cb();
                 });
         };
@@ -82,8 +82,9 @@ vorpal
                     cb();
                 })
                 .catch((error) => {
-                    //TODO resolve error from failure to take action
-                });
+                    volself.log(vorpal.chalk.red('Error '+error.status+': '+error.error));
+                    cb();
+                  });
         };
 
         displayProjects();
