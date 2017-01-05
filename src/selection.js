@@ -154,12 +154,12 @@ Selections.action = (volself, task) => {
         }];        
 
         actionlist.push(new inq.Separator());
-        tasklist.push({
+        actionlist.push({
             name: '..Done',
             value: -1,
             short: '.. Done'
         });
-        tasklist.push(new inq.Separator());
+        actionlist.push(new inq.Separator());
 
         volself.prompt({
             type: 'list',
@@ -169,7 +169,6 @@ Selections.action = (volself, task) => {
         }, function(result) {
             return resolve(result.action);
         });
-        resolve();
     });
 };
 
