@@ -15,18 +15,27 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
 - [x] List tasks within a selected project
   - [x] Colorize output based on priority
   - [x] Indent sub-tasks like Projects are handled.
-  - [ ] Take action on task: complete, edit(project, content, due, indent, order), delete, cancel.
+- [ ] Take action on task: 
+  - [x] Complete a task
+  - [ ] Edit a task (project, content, due) (Will need to use item-move if project diff)
+  - [ ] Change order / indent of task (use raw list) (use update multiple orders/indents) 
+  - [x] Delete a task
+  - [ ] Colorize the action list (green: complete, yellow: edit, magenta: change order, red: delete);
 - [x] Create a new task
   - [x] Set project, content, due date / time
   - [x] Validate content
   - [x] Colorize priority selection
+  - [ ] Confirm task before creation by displaying what they inputted and doing y/N. If N, cancel.
 - [ ] Manage
   - [ ] Projects (Create, edit (name, color, indent, order), delete, ..Go back)
-- [ ] Correct coloring schema to be terminal independent (also fix your personal terminal color scheme at this step...)
+- [ ] Correct project coloring schema to be terminal independent (also fix personal terminal colors at this step...)
 
 ### Stretch
 - [ ] Optional params to 'list', jump straight to a view (ie. 'list 7days')
-- [ ] Optional params to 'manage', jump straight to a view (ie. 'manage projects')
-- [ ] Add an existing or new label when *editing* a task
-- [ ] Add an existing or new label when *creating* a task
-- [ ] Create, edit, or delete a label from the manage command
+- [ ] Create: add ability to parse args into a new task, instead of prompting each field
+- [ ] Labels:
+  - [ ] Optional params to 'manage', jump straight to a view (ie. 'manage projects')
+  - [ ] Create, edit, or delete a label from the manage command
+  - [ ] Add an existing or new label when *editing* a task
+  - [ ] Add an existing or new label when *creating* a task
+   
