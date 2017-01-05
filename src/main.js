@@ -51,7 +51,7 @@ vorpal
                     }
                 })
                 .catch((error) => {
-                    volself.log(vorpal.chalk.red("Could not obtain tasks from Todoist, aborting."));
+                    volself.log(vorpal.chalk.red('Error ' + error.status + ': ' + error.error));
                     cb();
                 });
         };
@@ -65,26 +65,39 @@ vorpal
                         process.stdout.write("\u001B[2J\u001B[0;0f");
                         displayProjects();
                     } else {
-                        displayActions(task);
+                        displayActions(task, filter, sort);
                         cb();
                     }
                 })
                 .catch((error) => {
-                    volself.log(vorpal.chalk.red('Error '+error.status+': '+error.error));
+                    volself.log(vorpal.chalk.red('Error ' + error.status + ': ' + error.error));
                     cb();
                 });
         };
 
-        let displayActions = (task) => {
+        let displayActions = (task, filter, sort) => {
             return select.action(volself, task)
-                .then(() => {
-                    //TODO fill in this flow logic
-                    cb();
+                .then((action) => {
+                    switch (action) {
+                        case -1:
+                            return;
+                        case 0:
+                            return api.completeTask(task);
+                        case 1:
+                            return select.editTask(task);
+                        case 2:
+                            return select.moveTask(task);
+                        case 3:
+                            return select.deleteTask(task);
+                    }
+                })
+                .then((resolve) => {
+                    displayTasks(filter, sort);
                 })
                 .catch((error) => {
-                    volself.log(vorpal.chalk.red('Error '+error.status+': '+error.error));
+                    volself.log(vorpal.chalk.red('Error ' + error.status + ': ' + error.error));
                     cb();
-                  });
+                });
         };
 
         displayProjects();

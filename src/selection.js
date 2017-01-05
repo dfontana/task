@@ -147,6 +147,10 @@ Selections.action = (volself, task) => {
             name: "Move/Indent",
             value: 2,
             short: "Move/Indent"
+        }, {
+            name: "Delete Task",
+            value: 3,
+            short: "Delete"
         }];        
 
         actionlist.push(new inq.Separator());
