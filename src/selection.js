@@ -127,12 +127,44 @@ Selections.task = (volself, filter, sort) => {
     });
 };
 
-/** Takes action on a given task 
- * Edit, etc
+/** Returns the selected action by user.
+ * Marking complete, editing, moving, and deleting are supporting.
+ * - Editing changes task composition - project, due date, content
+ * - Moving changing order and indentation (prompt to move up/down one, right/left one)
+ * - Deleting confirms before deletion.
  */
 Selections.action = (volself, task) => {
     return new Promise((resolve, reject) => {
-        //TODO fill in this endpoint
+        var actionlist = [{
+            name: "Mark Complete",
+            value: 0,
+            short: "Complete"
+        },{
+            name: "Edit Task",
+            value: 1,
+            short: "Edit"
+        },{
+            name: "Move/Indent",
+            value: 2,
+            short: "Move/Indent"
+        }];        
+
+        actionlist.push(new inq.Separator());
+        tasklist.push({
+            name: '..Done',
+            value: -1,
+            short: '.. Done'
+        });
+        tasklist.push(new inq.Separator());
+
+        volself.prompt({
+            type: 'list',
+            name: 'action',
+            message: 'Select an action to perform on this task',
+            choices: actionlist
+        }, function(result) {
+            return resolve(result.action);
+        });
         resolve();
     });
 };
