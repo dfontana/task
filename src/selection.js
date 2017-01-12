@@ -133,7 +133,7 @@ Selections.task = (volself, filter, sort) => {
  * - Moving changing order and indentation (prompt to move up/down one, right/left one)
  * - Deleting confirms before deletion.
  */
-Selections.action = (volself, taskza) => {
+Selections.action = (volself) => {
     return new Promise((resolve, reject) => {
         var actionlist = [{
             name: colorizer.action.complete("Mark Complete"),

@@ -75,7 +75,7 @@ vorpal
         };
 
         let displayActions = (task, filter, sort) => {
-            return select.action(volself, task)
+            return select.action(volself)
                 .then((action) => {
                     switch (action) {
                         case -1:
