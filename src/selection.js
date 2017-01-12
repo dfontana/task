@@ -136,21 +136,21 @@ Selections.task = (volself, filter, sort) => {
 Selections.action = (volself, taskza) => {
     return new Promise((resolve, reject) => {
         var actionlist = [{
-            name: "Mark Complete",
+            name: colorizer.action.complete("Mark Complete"),
             value: 0,
-            short: "Complete"
+            short: colorizer.action.complete("Complete")
         },{
-            name: "Edit Task",
+            name: colorizer.action.edit("Edit Task"),
             value: 1,
-            short: "Edit"
+            short: colorizer.action.edit("Edit")
         },{
-            name: "Move/Indent",
+            name: colorizer.action.reorder("Move/Indent"),
             value: 2,
-            short: "Move/Indent"
+            short: colorizer.action.reorder("Move/Indent")
         }, {
-            name: "Delete Task",
+            name: colorizer.action.del("Delete Task"),
             value: 3,
-            short: "Delete"
+            short: colorizer.action.del("Delete")
         }];        
 
         actionlist.push(new inq.Separator());

@@ -20,7 +20,7 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
   - [ ] Edit a task (project, content, due) (Will need to use item-move if project diff)
   - [ ] Change order / indent of task (use raw list) (use update multiple orders/indents) 
   - [x] Delete a task
-  - [ ] Colorize the action list (green: complete, yellow: edit, magenta: change order, red: delete);
+  - [x] Colorize the action list (green: complete, yellow: edit, magenta: change order, red: delete);
 - [x] Create a new task
   - [x] Set project, content, due date / time
   - [x] Validate content

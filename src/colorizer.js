@@ -33,3 +33,10 @@ Colorizer.priority = {
     2: vorpal.chalk.magenta,
     1: vorpal.chalk.blue
 };
+
+Colorizer.action = {
+    del: vorpal.chalk.red,
+    complete: vorpal.chalk.green,
+    reorder: vorpal.chalk.magenta,
+    edit: vorpal.chalk.yellow
+};
