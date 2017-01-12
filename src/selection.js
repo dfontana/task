@@ -10,7 +10,7 @@ var util = require('./utilities');
 /** Generates a sorted, indented, colorized list of projects.
  * Given a data object containing all the projects from the api module.
  */
-let formatProjects = (projects) => {
+var formatProjects = (projects) => {
     return new Promise((resolve, reject) => {
         var projlist = [];
         for (var key in projects) {
@@ -200,7 +200,7 @@ Selections.deleteTask = (volself, taskID) => {
 };
 
 //============================== ADD TASK =====================================
-let obtainContent = (volself, hash) => {
+var obtainContent = (volself, hash) => {
     return new Promise((resolve, reject) => {
         volself.prompt({
             type: 'input',
@@ -219,7 +219,7 @@ let obtainContent = (volself, hash) => {
     });
 };
 
-let obtainDate = (volself, hash) => {
+var obtainDate = (volself, hash) => {
     return new Promise((resolve, reject) => {
         volself.prompt({
             type: 'input',
@@ -232,7 +232,7 @@ let obtainDate = (volself, hash) => {
     });
 };
 
-let obtainPriority = (volself, hash) => {
+var obtainPriority = (volself, hash) => {
     return new Promise((resolve, reject) => {
         var priolist = [{
             name: colorizer.priority[4]('High'),
@@ -266,7 +266,7 @@ let obtainPriority = (volself, hash) => {
     });
 };
 
-let obtainProject = (volself, hash) => {
+var obtainProject = (volself, hash) => {
     return new Promise((resolve, reject) => {
         api.projects()
             .then((projects) => {

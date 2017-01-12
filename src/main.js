@@ -19,7 +19,7 @@ vorpal
     .action(function(args, cb) {
         var volself = this;
 
-        let displayProjects = () => {
+        var displayProjects = () => {
             return select.project(volself)
                 .then((project) => {
                     switch (project) {
@@ -56,7 +56,7 @@ vorpal
                 });
         };
 
-        let displayTasks = (filter, sort) => {
+        var displayTasks = (filter, sort) => {
             return select.task(volself, filter, sort)
                 .then((task) => {
                     if (task == '.. Done') {
