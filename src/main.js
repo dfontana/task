@@ -85,7 +85,7 @@ vorpal
                         case 1:
                             return select.editTask(volself, task);
                         case 2:
-                            return select.moveTask(volself, task);
+                            return select.reorderTask(volself, task);
                         case 3:
                             return select.deleteTask(volself, task.id);
                     }

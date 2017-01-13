@@ -181,6 +181,30 @@ TodoistAPI.deleteTask = (taskID) => {
     return atomicTaskOp(taskID, payload, task_uuid);
 };
 
+/** Updates the given tasks (and related tasks) order in project
+ * tasks - sorted list of tasks (by project order) within the project, excluding taskToUpdate
+ * taskToUpdate - the task whose order is being updated
+ * newOrder - the new order (number) of taskToUpdate within the tasks.
+ */
+TodoistAPI.updateItemOrders = (task, newOrder) => {
+    var task_uuid = uuid.v1();
+    var payload = {
+        url: entry,
+        form: {
+            token: user.token,
+            commands: JSON.stringify([{
+                "type": 'item_update',
+                "uuid": task_uuid,
+                "args": {
+                    "id": task.id,
+                    "item_order": newOrder
+                }
+            }])
+        }
+    };
+    return atomicTaskOp(task.id, payload, task_uuid);
+};
+
 /** Interal Use. Performs an 'atomic' task operation.
  * For simple ops that do not require additional computations after
  * server side command is complete, such as item_delete or item_complete.

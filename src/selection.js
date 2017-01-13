@@ -139,11 +139,11 @@ Selections.action = (volself) => {
             name: colorizer.action.complete("Mark Complete"),
             value: 0,
             short: colorizer.action.complete("Complete")
-        },{
+        }, {
             name: colorizer.action.edit("Edit Task"),
             value: 1,
             short: colorizer.action.edit("Edit")
-        },{
+        }, {
             name: colorizer.action.reorder("Move/Indent"),
             value: 2,
             short: colorizer.action.reorder("Move/Indent")
@@ -151,7 +151,7 @@ Selections.action = (volself) => {
             name: colorizer.action.del("Delete Task"),
             value: 3,
             short: colorizer.action.del("Delete")
-        }];        
+        }];
 
         actionlist.push(new inq.Separator());
         actionlist.push({
@@ -168,33 +168,6 @@ Selections.action = (volself) => {
             choices: actionlist
         }, function(result) {
             return resolve(result.action);
-        });
-    });
-};
-
-/** Confirms task deletion.
- * Prompts user for yes no, when deleting a task is the selected action.
- * Then performs their requested operation.
- */
-Selections.deleteTask = (volself, taskID) => {
-    return new Promise((resolve, reject) => {
-        volself.prompt({
-            type: 'confirm',
-            name: 'del',
-            message: 'Are you sure you want to delete this task?',
-            default: false
-        }, function(result) {
-            if(result.del){
-                api.deleteTask(taskID)
-                    .then((result) =>{
-                        return resolve();
-                    })
-                    .catch((error) => {
-                        return reject(error);
-                    });
-            }else{
-                return resolve();
-            }
         });
     });
 };
@@ -309,4 +282,116 @@ Selections.addTask = (volself) => {
 };
 
 //============================== TASK ACTIONS =================================
+/** Confirms task deletion.
+ * Prompts user for yes no, when deleting a task is the selected action.
+ * Then performs their requested operation.
+ */
+Selections.deleteTask = (volself, taskID) => {
+    return new Promise((resolve, reject) => {
+        volself.prompt({
+            type: 'confirm',
+            name: 'del',
+            message: 'Are you sure you want to delete this task?',
+            default: false
+        }, function(result) {
+            if (result.del) {
+                api.deleteTask(taskID)
+                    .then((result) => {
+                        return resolve();
+                    })
+                    .catch((error) => {
+                        return reject(error);
+                    });
+            } else {
+                return resolve();
+            }
+        });
+    });
+};
 
+/** Changes task's order.
+ * Prompts user with a raw prompt, asking which task they would like to move their
+ * selected task before. If no selection made, order remains same.
+ */
+var obtainNewOrder = (volself, task) => {
+    return new Promise((resolve, reject) => {
+        var listTaskIndicator = util.startWaitingIndicator();
+        
+        var filter = function(value) {
+            return value.project_id == task.project_id && value.id != task.id;
+        };
+
+        var sort = function(a,b) {
+            return a.value.item_order - b.value.item_order;
+        };
+
+        api.tasks(filter)
+            .then((tasks) => {
+                util.stopWaitingIndicator(listTaskIndicator);
+
+                var nodeWidth = process.stdout.columns || 80;
+                var lineWidth = Math.floor(nodeWidth * 0.55);
+
+                var tasklist = [];
+                for (var key in tasks) {
+                    var obj = {};
+                    var content = formatter.parseContent(lineWidth,
+                        tasks[key].content,
+                        tasks[key].indent,
+                        tasks[key].due_date_utc);
+                    obj.name = colorizer.priority[tasks[key].priority](content);
+                    obj.value = tasks[key];
+                    obj.short = tasks[key].content;
+                    tasklist.push(obj);
+                }
+
+                tasklist.sort(sort);
+
+                tasklist.unshift({
+                    name: '<First Item>',
+                    value: {
+                        item_order: 0
+                    },
+                    short: '<First Item>'
+                });
+
+                volself.prompt({
+                    type: 'list',
+                    name: 'task',
+                    message: 'Move task after which task?',
+                    choices: tasklist
+                }, function(result) { 
+                    return resolve(result.task.item_order);
+                });
+            })
+            .catch((error) => {
+                reject(error);
+            }); 
+    });
+};
+
+Selections.reorderTask = (volself, task) => {
+    return new Promise((resolve, reject) => {
+        obtainNewOrder(volself, task)
+            .then((newOrder) => {
+               return api.updateItemOrders(task, newOrder);
+            })
+            .then((res) => {
+                resolve();
+            })
+            .catch((error) => {
+                console.log("Errored in selection");
+                reject(error);
+            });
+    });
+};
+
+/** Changes task's content, due date, and project.
+ *
+ * Default prompt values are the current task's values.
+ */
+Selections.editTask = (volself, task) => {
+    return new Promise((resolve, reject) => {
+
+    });
+};
