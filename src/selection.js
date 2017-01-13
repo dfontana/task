@@ -285,7 +285,7 @@ Selections.addTask = (volself) => {
     });
 };
 
-//============================== TASK ACTIONS =================================
+//============================== DELETE TASK ==================================
 /** Confirms task deletion.
  * Prompts user for yes no, when deleting a task is the selected action.
  * Then performs their requested operation.
@@ -313,10 +313,8 @@ Selections.deleteTask = (volself, taskID) => {
     });
 };
 
-/** Changes task's order.
- * Prompts user with a raw prompt, asking which task they would like to move their
- * selected task before. If no selection made, order remains same.
- */
+//============================== REORDER TASK =================================
+//Prompts user for ordering
 var obtainNewOrder = (volself, task) => {
     return new Promise((resolve, reject) => {
         var listTaskIndicator = util.startWaitingIndicator();
@@ -377,26 +375,32 @@ var obtainNewOrder = (volself, task) => {
     });
 };
 
+//generates correct orderings of items, given new order
 var updateOrders = (tasks, taskToUpdate, newOrder) => {
+    //Correct Off by one when moving items lower
     if(taskToUpdate.item_order < newOrder){
         newOrder -= 1;
     }
-    var taskOrders = {};
-
+    
+    //Sort the tasks
     tasks.sort(function(a, b) {
         return a.item_order - b.item_order;
     });
 
+    //Insert updated task
     if (newOrder <= 0) {
         tasks.unshift(taskToUpdate);
     } else {
         tasks.splice(newOrder, 0, taskToUpdate);
     }
 
+    //Normalize the orders
     for (var i = 0; i < tasks.length; i++) {
         tasks[i].item_order = i + 1;
     }
 
+    //Generate api object
+    var taskOrders = {};
     tasks.forEach((item) => {
         var ary = [];
         ary.push(item.item_order);
@@ -404,9 +408,11 @@ var updateOrders = (tasks, taskToUpdate, newOrder) => {
         taskOrders[item.id] = ary;
     });
 
+    //call API
     return api.updateItemOrders(taskOrders);
 };
 
+//controls reorder flow
 Selections.reorderTask = (volself, task) => {
     return new Promise((resolve, reject) => {
         obtainNewOrder(volself, task)
@@ -423,6 +429,7 @@ Selections.reorderTask = (volself, task) => {
     });
 };
 
+//============================== REINDENT TASK ================================
 /** Changes task's indentation.
  * Increase by one or two
  * Decrease by one or two
@@ -433,8 +440,8 @@ Selections.reindentTask = (volself, task) => {
     });
 };
 
+//============================== EDIT TASK ====================================
 /** Changes task's content, due date, and project.
- *
  * Default prompt values are the current task's values.
  */
 Selections.editTask = (volself, task) => {
