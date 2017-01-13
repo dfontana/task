@@ -28,11 +28,11 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
   - [x] Colorize priority selection
   - [ ] DEFECT: All tasks get added to Inbox, reguardless of selection
   - [ ] Confirm task before creation by displaying what they inputted and doing y/N. If N, cancel.
+
+### Stretch
 - [ ] Manage
   - [ ] Projects (Create, edit (name, color, indent, order), delete, ..Go back)
 - [ ] Correct project coloring schema to be terminal independent (also fix personal terminal colors at this step...)
-
-### Stretch
 - [ ] Optional params to 'list', jump straight to a view (ie. 'list 7days')
 - [ ] Create: add ability to parse args into a new task, instead of prompting each field
 - [ ] Labels:
