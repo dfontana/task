@@ -147,7 +147,7 @@ Selections.action = (volself) => {
             name: colorizer.action.reorder("Reorder"),
             value: 2,
             short: colorizer.action.reorder("Reorder")
-        },{
+        }, {
             name: colorizer.action.reindent("Update Indentation"),
             value: 3,
             short: colorizer.action.reindent("Update Indentation")
@@ -320,12 +320,12 @@ Selections.deleteTask = (volself, taskID) => {
 var obtainNewOrder = (volself, task) => {
     return new Promise((resolve, reject) => {
         var listTaskIndicator = util.startWaitingIndicator();
-        
+
         var filter = function(value) {
             return value.project_id == task.project_id && value.id != task.id;
         };
 
-        var sort = function(a,b) {
+        var sort = function(a, b) {
             return a.value.item_order - b.value.item_order;
         };
 
@@ -364,20 +364,54 @@ var obtainNewOrder = (volself, task) => {
                     name: 'task',
                     message: 'Move task after which task?',
                     choices: tasklist
-                }, function(result) { 
-                    return resolve(result.task.item_order);
+                }, function(result) {
+                    return resolve({
+                        tasks: tasks,
+                        newOrder: result.task.item_order
+                    });
                 });
             })
             .catch((error) => {
                 reject(error);
-            }); 
+            });
     });
 };
+
+var updateOrders = (tasks, taskToUpdate, newOrder) => {
+    if(taskToUpdate.item_order < newOrder){
+        newOrder -= 1;
+    }
+    var taskOrders = {};
+
+    tasks.sort(function(a, b) {
+        return a.item_order - b.item_order;
+    });
+
+    if (newOrder <= 0) {
+        tasks.unshift(taskToUpdate);
+    } else {
+        tasks.splice(newOrder, 0, taskToUpdate);
+    }
+
+    for (var i = 0; i < tasks.length; i++) {
+        tasks[i].item_order = i + 1;
+    }
+
+    tasks.forEach((item) => {
+        var ary = [];
+        ary.push(item.item_order);
+        ary.push(item.indent);
+        taskOrders[item.id] = ary;
+    });
+
+    return api.updateItemOrders(taskOrders);
+};
+
 Selections.reorderTask = (volself, task) => {
     return new Promise((resolve, reject) => {
         obtainNewOrder(volself, task)
-            .then((newOrder) => {
-               return api.updateItemOrders(task, newOrder);
+            .then((orderBundle) => {
+                return updateOrders(orderBundle.tasks, task, orderBundle.newOrder);
             })
             .then((res) => {
                 resolve();
@@ -395,7 +429,7 @@ Selections.reorderTask = (volself, task) => {
  */
 Selections.reindentTask = (volself, task) => {
     return new Promise((resolve, reject) => {
-    
+
     });
 };
 

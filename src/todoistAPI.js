@@ -157,7 +157,7 @@ TodoistAPI.completeTask = (taskID) => {
             }])
         }
     };
-    return atomicTaskOp(taskID, payload, task_uuid);
+    return atomicTaskOp(payload, task_uuid);
 };
 
 /** Deletes the given taskid.
@@ -178,7 +178,7 @@ TodoistAPI.deleteTask = (taskID) => {
             }])
         }
     };
-    return atomicTaskOp(taskID, payload, task_uuid);
+    return atomicTaskOp(payload, task_uuid);
 };
 
 /** Updates the given tasks (and related tasks) order in project
@@ -186,24 +186,28 @@ TodoistAPI.deleteTask = (taskID) => {
  * taskToUpdate - the task whose order is being updated
  * newOrder - the new order (number) of taskToUpdate within the tasks.
  */
-TodoistAPI.updateItemOrders = (task, newOrder) => {
+TodoistAPI.updateItemOrders = (taskOrders) => {
     var task_uuid = uuid.v1();
     var payload = {
         url: entry,
         form: {
             token: user.token,
             commands: JSON.stringify([{
-                "type": 'item_update',
+                "type": 'item_update_orders_indents',
                 "uuid": task_uuid,
                 "args": {
-                    "id": task.id,
-                    "item_order": newOrder
+                    "ids_to_orders_indents": taskOrders
                 }
             }])
         }
     };
-    return atomicTaskOp(task.id, payload, task_uuid);
+    return atomicTaskOp(payload, task_uuid);
 };
+
+/** Updates the given task's indentation in project
+ *
+ */
+
 
 /** Interal Use. Performs an 'atomic' task operation.
  * For simple ops that do not require additional computations after
@@ -212,7 +216,7 @@ TodoistAPI.updateItemOrders = (task, newOrder) => {
  * May be replaced in future, be sure to call wrapper functions to 
  * ensure safe, reliable operation.
  */
-var atomicTaskOp = (taskID, payload, task_uuid) => {
+var atomicTaskOp = (payload, task_uuid) => {
     return new Promise((resolve, reject) => {
         request.post(payload, function(err, httpResponse, body) {
             if (!err && httpResponse.statusCode == 200) {
