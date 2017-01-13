@@ -144,12 +144,16 @@ Selections.action = (volself) => {
             value: 1,
             short: colorizer.action.edit("Edit")
         }, {
-            name: colorizer.action.reorder("Move/Indent"),
+            name: colorizer.action.reorder("Reorder"),
             value: 2,
-            short: colorizer.action.reorder("Move/Indent")
+            short: colorizer.action.reorder("Reorder")
+        },{
+            name: colorizer.action.reindent("Update Indentation"),
+            value: 3,
+            short: colorizer.action.reindent("Update Indentation")
         }, {
             name: colorizer.action.del("Delete Task"),
-            value: 3,
+            value: 4,
             short: colorizer.action.del("Delete")
         }];
 
@@ -369,7 +373,6 @@ var obtainNewOrder = (volself, task) => {
             }); 
     });
 };
-
 Selections.reorderTask = (volself, task) => {
     return new Promise((resolve, reject) => {
         obtainNewOrder(volself, task)
@@ -383,6 +386,16 @@ Selections.reorderTask = (volself, task) => {
                 console.log("Errored in selection");
                 reject(error);
             });
+    });
+};
+
+/** Changes task's indentation.
+ * Increase by one or two
+ * Decrease by one or two
+ */
+Selections.reindentTask = (volself, task) => {
+    return new Promise((resolve, reject) => {
+    
     });
 };
 

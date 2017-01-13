@@ -87,6 +87,8 @@ vorpal
                         case 2:
                             return select.reorderTask(volself, task);
                         case 3:
+                            return select.reindentTask(volself, task);
+                        case 4:
                             return select.deleteTask(volself, task.id);
                     }
                 })

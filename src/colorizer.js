@@ -38,5 +38,6 @@ Colorizer.action = {
     del: vorpal.chalk.red,
     complete: vorpal.chalk.green,
     reorder: vorpal.chalk.magenta,
+    reindent: vorpal.chalk.blue,
     edit: vorpal.chalk.yellow
 };
