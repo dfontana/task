@@ -24,6 +24,7 @@ vorpal
                 .then((project) => {
                     switch (project) {
                         case '.. Done':
+                            process.stdout.write("\u001B[2J\u001B[0;0f");
                             cb();
                             break;
                         case 'Today':
@@ -60,6 +61,7 @@ vorpal
             return select.task(volself, filter, sort)
                 .then((task) => {
                     if (task == '.. Done') {
+                        process.stdout.write("\u001B[2J\u001B[0;0f");
                         cb();
                     } else if (task == '.. Return to Project List') {
                         process.stdout.write("\u001B[2J\u001B[0;0f");

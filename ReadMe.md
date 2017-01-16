@@ -33,10 +33,7 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
 - [ ] The first item in a list can have it's indentation set (whereas the web client does not allow this)
 - [ ] Error not handled properly on internet loss (crashes)
 - [ ] Reordering a task with subtasks does not move the whole group.
-
-### Refactoring Goals
-- [ ] Reduce number of times you establish prompt content and call volself.prompt
-- [ ] Reduce duplication inside the API
+- [ ] Returning from some actions does not reflect the actions until the user leaves the task list and reenters (race condition?)
 
 ### Stretch
 - [ ] Manage
