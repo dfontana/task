@@ -19,15 +19,19 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
   - [x] Complete a task
   - [ ] Edit a task (project, content, due) (Will need to use item-move if project diff)
   - [x] Change order of tasks 
-  - [ ] Change indent of task
+  - [x] Change indent of task
   - [x] Delete a task
   - [x] Colorize the action list (green: complete, yellow: edit, magenta: change order, red: delete);
 - [x] Create a new task
   - [x] Set project, content, due date / time
   - [x] Validate content
   - [x] Colorize priority selection
-  - [x] DEFECT: All tasks get added to Inbox, reguardless of selection
   - [ ] Confirm task before creation by displaying what they inputted and doing y/N. If N, cancel.
+
+### Defects
+- [ ] After adjusting indentation, tasks are displayed before the server finishes updating the indentation
+- [ ] The first item in a list can have it's indentation set (whereas the web client does not allow this)
+- [ ] Error not handled properly on internet loss (crashes)
 
 ### Stretch
 - [ ] Manage

@@ -148,9 +148,9 @@ Selections.action = (volself) => {
             value: 2,
             short: colorizer.action.reorder("Reorder")
         }, {
-            name: colorizer.action.reindent("Update Indentation"),
+            name: colorizer.action.reindent("Set indentation"),
             value: 3,
-            short: colorizer.action.reindent("Update Indentation")
+            short: colorizer.action.reindent("Set indentation")
         }, {
             name: colorizer.action.del("Delete Task"),
             value: 4,
@@ -378,10 +378,10 @@ var obtainNewOrder = (volself, task) => {
 //generates correct orderings of items, given new order
 var updateOrders = (tasks, taskToUpdate, newOrder) => {
     //Correct Off by one when moving items lower
-    if(taskToUpdate.item_order < newOrder){
+    if (taskToUpdate.item_order < newOrder) {
         newOrder -= 1;
     }
-    
+
     //Sort the tasks
     tasks.sort(function(a, b) {
         return a.item_order - b.item_order;
@@ -429,14 +429,53 @@ Selections.reorderTask = (volself, task) => {
     });
 };
 
-//============================== REINDENT TASK ================================
-/** Changes task's indentation.
- * Increase by one or two
- * Decrease by one or two
+//============================== MAKE SUBTASK =================================
+/** Updates indentation of a task.
+ * Prompts user for amount (none, once, twice, three times). 
+ * Calls API to update the task's indent value with number between 1 & 4.
  */
-Selections.reindentTask = (volself, task) => {
+var getIndentLevel = (volself) => {
     return new Promise((resolve, reject) => {
+        var options = [{
+            name: 'None',
+            value: 1,
+            short: 'None'
+        }, {
+            name: 'Once',
+            value: 2,
+            short: 'Once'
+        }, {
+            name: 'Twice',
+            value: 3,
+            short: 'Twice'
+        }, {
+            name: 'Three times',
+            value: 4,
+            short: 'Three times'
+        }];
 
+        volself.prompt({
+            type: 'list',
+            name: 'level',
+            message: 'Indent how much?',
+            choices: options,
+            default: options[0]
+        }, function(result) {
+            resolve(result.level);
+        });
+    });
+};
+
+Selections.updateIndent = (volself, task) => {
+    return new Promise((resolve, reject) => {
+        getIndentLevel(volself)
+            .then((indentLevel) => {
+                api.setIndentLevel(task.id, indentLevel);
+                resolve();
+            })
+            .catch((error) => {
+                reject(error);
+            });
     });
 };
 
