@@ -26,7 +26,7 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
   - [x] Set project, content, due date / time
   - [x] Validate content
   - [x] Colorize priority selection
-  - [ ] DEFECT: All tasks get added to Inbox, reguardless of selection
+  - [x] DEFECT: All tasks get added to Inbox, reguardless of selection
   - [ ] Confirm task before creation by displaying what they inputted and doing y/N. If N, cancel.
 
 ### Stretch

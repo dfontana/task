@@ -111,20 +111,17 @@ vorpal
 
         select.addTask(volself)
             .then((answers) => {
-                api.addTask(answers.project.project_id,
+                api.addTask(answers.project.id,
                         answers.date,
                         answers.priority,
                         null,
-                        answers.content)
-                    .then(function() {
-                        volself.log(vorpal.chalk.green('Task added.'));
-                        cb();
-                    })
-                    .catch((error) => {
-                        volself.log(vorpal.chalk.red('ERROR: ' + error.status + ' - ' + error.error));
-                        cb();
-                    });
-            }).catch((error) => {
+                        answers.content);
+            })
+            .then(()=>{
+                volself.log(vorpal.chalk.green('Task Added.'));
+                cb();
+            })
+            .catch((error) => {
                 volself.log(vorpal.chalk.red('ERROR: ' + error.status + ' - ' + error.error));
                 cb();
             });
