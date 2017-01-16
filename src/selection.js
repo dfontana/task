@@ -339,6 +339,9 @@ Selections.reorderTask = (volself, task) => {
             .then((taskOrders) => {
                 api.updateItemOrders(taskOrders);
             })
+            .then(()=>{
+                resolve();
+            })
             .catch((error) => {
                 reject(error);
             });
