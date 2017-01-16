@@ -1,37 +1,13 @@
 var Selections = module.exports;
 var inq = require('inquirer');
 var api = require('./todoistAPI');
-var formatter = require('./formatter');
+var format = require('./formatter');
 var colorizer = require('./colorizer');
 var util = require('./utilities');
 
 
 //============================== LIST OPTIONS =================================
-/** Generates a sorted, indented, colorized list of projects.
- * Given a data object containing all the projects from the api module.
- */
-var formatProjects = (projects) => {
-    return new Promise((resolve, reject) => {
-        var projlist = [];
-        for (var key in projects) {
-            var obj = {};
-            var name = '';
-            for (var i = 1; i < projects[key].indent; i++) {
-                name += ' ';
-            }
-            name += projects[key].name;
-            obj.name = colorizer.project[projects[key].color](name);
-            obj.value = projects[key];
-            obj.short = name;
-            projlist.push(obj);
-        }
 
-        projlist.sort(function(a, b) {
-            return a.value.item_order - b.value.item_order;
-        });
-        resolve(projlist);
-    });
-};
 
 /** Returns selected project by user.
  * Obtains projects via API call.
@@ -47,7 +23,7 @@ Selections.project = (volself) => {
         api.projects()
             .then((projects) => {
                 util.stopWaitingIndicator(listProjectsIndicator);
-                return formatProjects(projects);
+                return format.projectList(projects);
             }).then((projlist) => {
                 projlist.unshift(new inq.Separator());
                 projlist.unshift('Next 7');
@@ -95,7 +71,7 @@ Selections.task = (volself, filter, sort) => {
                 var tasklist = [];
                 for (var key in tasks) {
                     var obj = {};
-                    var content = formatter.parseContent(lineWidth,
+                    var content = format.parseContent(lineWidth,
                         tasks[key].content,
                         tasks[key].indent,
                         tasks[key].due_date_utc);
@@ -247,7 +223,7 @@ var obtainProject = (volself, hash) => {
     return new Promise((resolve, reject) => {
         api.projects()
             .then((projects) => {
-                return formatProjects(projects);
+                return format.projectList(projects);
             }).then((projlist) => {
                 projlist.push(new inq.Separator());
                 volself.prompt({
@@ -337,7 +313,7 @@ var obtainNewOrder = (volself, task) => {
                 var tasklist = [];
                 for (var key in tasks) {
                     var obj = {};
-                    var content = formatter.parseContent(lineWidth,
+                    var content = format.parseContent(lineWidth,
                         tasks[key].content,
                         tasks[key].indent,
                         tasks[key].due_date_utc);
@@ -423,7 +399,6 @@ Selections.reorderTask = (volself, task) => {
                 resolve();
             })
             .catch((error) => {
-                console.log("Errored in selection");
                 reject(error);
             });
     });

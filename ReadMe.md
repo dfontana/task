@@ -33,6 +33,11 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
 - [ ] The first item in a list can have it's indentation set (whereas the web client does not allow this)
 - [ ] Error not handled properly on internet loss (crashes)
 
+### Refactoring Goals
+- [ ] Remove the need to import inq just to make a seperator
+- [ ] Reduce number of times you establish prompt content and call volself.prompt
+- [ ] Reduce duplication inside the API
+
 ### Stretch
 - [ ] Manage
   - [ ] Projects (Create, edit (name, color, indent, order), delete, ..Go back)

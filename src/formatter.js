@@ -57,7 +57,6 @@ var parseDate = function(dateString) {
     }
 };
 
-
 /** Returns contentWidth characters worth of content.
  * Runs the given UTC format date string through the date parser, to append to the end of the content string.
  * Then determines content:
@@ -78,4 +77,30 @@ Formatter.parseContent = function(lineWidth, rawContent, indent, rawDate) {
     }
     content += date;
     return content;
+};
+
+/** Generates a sorted, indented, colorized list of projects.
+ * Given a data object containing all the projects from the api module.
+ */
+Formatter.projectList = (projects) => {
+    return new Promise((resolve, reject) => {
+        var projlist = [];
+        for (var key in projects) {
+            var obj = {};
+            var name = '';
+            for (var i = 1; i < projects[key].indent; i++) {
+                name += ' ';
+            }
+            name += projects[key].name;
+            obj.name = colorizer.project[projects[key].color](name);
+            obj.value = projects[key];
+            obj.short = name;
+            projlist.push(obj);
+        }
+
+        projlist.sort(function(a, b) {
+            return a.value.item_order - b.value.item_order;
+        });
+        resolve(projlist);
+    });
 };
