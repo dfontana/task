@@ -7,8 +7,6 @@ var util = require('./utilities');
 
 
 //============================== LIST OPTIONS =================================
-
-
 /** Returns selected project by user.
  * Obtains projects via API call.
  * Colorizes projects.

@@ -1,4 +1,5 @@
 var util = require('./utilities');
+var colorizer = require('./colorizer');
 
 var Formatter = module.exports;
 
