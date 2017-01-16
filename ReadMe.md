@@ -29,7 +29,6 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
   - [ ] Confirm task before creation by displaying what they inputted and doing y/N. If N, cancel.
 
 ### Defects
-- [ ] After adjusting indentation, tasks are displayed before the server finishes updating the indentation
 - [ ] The first item in a list can have it's indentation set (whereas the web client does not allow this)
 - [ ] Error not handled properly on internet loss (crashes)
 - [ ] Reordering a task with subtasks does not move the whole group.
