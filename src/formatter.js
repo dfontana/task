@@ -105,3 +105,41 @@ Formatter.projectList = (projects) => {
         resolve(projlist);
     });
 };
+
+/** Generates a sorted, indented, colorized list of tasks.
+ * @param tasks a data object containing all the tasks of a project from the api module.
+ * @param sort a sorting function to apply to the list of tasks
+ * @param unshiftThese a list of items to unshift onto the array, in the given order (or null);
+ * @param pushThese a list of items to push onto the array, in the given order (or null);
+ */
+Formatter.taskList = (tasks, sort, unshiftThese, pushThese) => {
+    return new Promise((resolve, reject) => {
+        var nodeWidth = process.stdout.columns || 80;
+        var lineWidth = Math.floor(nodeWidth * 0.55);
+
+        var tasklist = [];
+        for (var key in tasks) {
+            var obj = {};
+            var content = this.parseContent(lineWidth,
+                tasks[key].content,
+                tasks[key].indent,
+                tasks[key].due_date_utc);
+            obj.name = colorizer.priority[tasks[key].priority](content);
+            obj.value = tasks[key];
+            obj.short = tasks[key].content;
+            tasklist.push(obj);
+        }
+
+        tasklist.sort(sort);
+        
+        if(unshiftThese){
+            tasklist = unshiftThese.concat(tasklist);
+        }
+
+        if(pushThese){
+            tasklist = tasklist.concat(pushThese);
+        }
+
+        resolve(tasklist);
+    });
+};

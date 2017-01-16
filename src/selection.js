@@ -6,13 +6,24 @@ var colorizer = require('./colorizer');
 var util = require('./utilities');
 
 
+var promptUser = (volself, options, defaultOption, message, returnFunction) => {
+    return new Promise((resolve, reject) => {
+        volself.prompt({
+            type: 'list',
+            name: 'selected',
+            message: message,
+            default: defaultOption,
+            choices: options
+        }, returnFunction);
+    });
+};
+
 //============================== LIST OPTIONS =================================
 /** Returns selected project by user.
  * Obtains projects via API call.
- * Colorizes projects.
- * Inserts additional options.
- * Prompts user.
- * Returns selected option (as an object).
+ * Pads the list with additional options
+ * Prompts the user.
+ * Returns selected option.
  */
 Selections.project = (volself) => {
     return new Promise((resolve, reject) => {
@@ -23,23 +34,13 @@ Selections.project = (volself) => {
                 util.stopWaitingIndicator(listProjectsIndicator);
                 return format.projectList(projects);
             }).then((projlist) => {
-                projlist.unshift(new inq.Separator());
-                projlist.unshift('Next 7');
-                projlist.unshift('Today');
-                projlist.push(new inq.Separator());
-                projlist.push('.. Done');
-                projlist.push(new inq.Separator());
+                projlist = ['Today','Next 7', new inq.Separator()]
+                            .concat(projlist)
+                            .concat([new inq.Separator(), '.. Done', new inq.Separator()]);
 
-                volself.prompt({
-                    type: 'list',
-                    name: 'project',
-                    message: 'Select a project to view tasks',
-                    default: projlist[1],
-                    choices: projlist
-                }, function(result) {
-                    return resolve(result.project);
+                return promptUser(volself,projlist, projlist[0], 'Select a project to view tasks', function(result) {
+                    resolve(result.selected);
                 });
-
             })
             .catch((error) => {
                 reject(error);
@@ -49,11 +50,10 @@ Selections.project = (volself) => {
 
 /** Returns selected task by user.
  * Obtains tasks via API call, based on the given filter.
- * Colorizes tasks by priority.
- * Sorts tasks by the given filter (think date, project order, etc)
  * Adds additional options (navigation for user)
+ * Formats the task list (content, priority, colors).
  * Prompts user.
- * Returns selected option (as an object).
+ * Returns selected option.
  */
 Selections.task = (volself, filter, sort) => {
     return new Promise((resolve, reject) => {
@@ -62,38 +62,13 @@ Selections.task = (volself, filter, sort) => {
         api.tasks(filter)
             .then((tasks) => {
                 util.stopWaitingIndicator(listTaskIndicator);
-
-                var nodeWidth = process.stdout.columns || 80;
-                var lineWidth = Math.floor(nodeWidth * 0.55);
-
-                var tasklist = [];
-                for (var key in tasks) {
-                    var obj = {};
-                    var content = format.parseContent(lineWidth,
-                        tasks[key].content,
-                        tasks[key].indent,
-                        tasks[key].due_date_utc);
-                    obj.name = colorizer.priority[tasks[key].priority](content);
-                    obj.value = tasks[key];
-                    obj.short = tasks[key].content;
-                    tasklist.push(obj);
-                }
-
-                tasklist.sort(sort);
-
-                tasklist.push(new inq.Separator());
-                tasklist.push('.. Return to Project List');
-                tasklist.push('.. Done');
-                tasklist.push(new inq.Separator());
-
-                volself.prompt({
-                    type: 'list',
-                    name: 'task',
-                    message: 'Select a task to perform an action',
-                    choices: tasklist
-                }, function(result) {
-                    return resolve(result.task);
-                });
+                var pushThese = [new inq.Separator(), '.. Return to Project List', '.. Done', new inq.Separator()];
+                return format.taskList(tasks, sort, null, pushThese);
+            })
+            .then((tasklist) => {
+                return promptUser(volself,tasklist, tasklist[1], 'Select a task to perform an action', function(result) {
+                    resolve(result.selected);
+                });    
             })
             .catch((error) => {
                 reject(error);
@@ -102,9 +77,11 @@ Selections.task = (volself, filter, sort) => {
 };
 
 /** Returns the selected action by user.
- * Marking complete, editing, moving, and deleting are supporting.
+ * Marking complete, editing, reordering, indenting, and deleting are supported.
+ * - Completing marks a task as complete, which removes it from the list.
  * - Editing changes task composition - project, due date, content
- * - Moving changing order and indentation (prompt to move up/down one, right/left one)
+ * - Reordering changes the position of a task.
+ * - Indenting changes the indentation of a task, making it a subtask.
  * - Deleting confirms before deletion.
  */
 Selections.action = (volself) => {
@@ -112,11 +89,11 @@ Selections.action = (volself) => {
         var actionlist = [{
             name: colorizer.action.complete("Mark Complete"),
             value: 0,
-            short: colorizer.action.complete("Complete")
+            short: colorizer.action.complete("Mark Complete")
         }, {
             name: colorizer.action.edit("Edit Task"),
             value: 1,
-            short: colorizer.action.edit("Edit")
+            short: colorizer.action.edit("Edit Task")
         }, {
             name: colorizer.action.reorder("Reorder"),
             value: 2,
@@ -128,24 +105,15 @@ Selections.action = (volself) => {
         }, {
             name: colorizer.action.del("Delete Task"),
             value: 4,
-            short: colorizer.action.del("Delete")
-        }];
-
-        actionlist.push(new inq.Separator());
-        actionlist.push({
+            short: colorizer.action.del("Delete Task")
+        }, new inq.Separator(),{
             name: '..Done',
             value: -1,
             short: '.. Done'
-        });
-        actionlist.push(new inq.Separator());
-
-        volself.prompt({
-            type: 'list',
-            name: 'action',
-            message: 'Select an action to perform on this task',
-            choices: actionlist
-        }, function(result) {
-            return resolve(result.action);
+        }, new inq.Separator()];
+        
+        return promptUser(volself,actionlist, actionlist[0], 'Select an action to perform on this task', function(result) {
+            resolve(result.selected);
         });
     });
 };
@@ -158,10 +126,7 @@ var obtainContent = (volself, hash) => {
             name: 'content',
             message: 'Task Content: ',
             validate: function(input) {
-                if (input.trim() === '') {
-                    return false;
-                }
-                return true;
+                return ((input.trim() === '') ? false : true);
             }
         }, function(result) {
             hash.content = result.content;
@@ -203,17 +168,10 @@ var obtainPriority = (volself, hash) => {
             short: 'None'
         }];
 
-        volself.prompt({
-                type: 'list',
-                name: 'priority',
-                message: 'Task Priority:',
-                default: priolist[3],
-                choices: priolist
-            },
-            function(result) {
-                hash.priority = result.priority;
-                resolve(hash);
-            });
+        return promptUser(volself,priolist, priolist[3], 'Task Priority:', function(result) {
+            hash.priority = result.selected;
+            resolve(hash);
+        });
     });
 };
 
@@ -224,14 +182,9 @@ var obtainProject = (volself, hash) => {
                 return format.projectList(projects);
             }).then((projlist) => {
                 projlist.push(new inq.Separator());
-                volself.prompt({
-                    type: 'list',
-                    name: 'project',
-                    message: 'Select a project to put task in',
-                    default: projlist[1],
-                    choices: projlist
-                }, function(result) {
-                    hash.project = result.project;
+                
+                return promptUser(volself,projlist, projlist[1], 'Select a project to put task in', function(result) {
+                    hash.project = result.selected;
                     resolve(hash);
                 });
             })
@@ -241,7 +194,12 @@ var obtainProject = (volself, hash) => {
     });
 };
 
-Selections.addTask = (volself) => {
+/** Controls flow for adding a task, returns task content
+ * The hash is passed between promises and built upon as the user answers
+ * each prompt, ultimately resulting in all the content for the new task stored
+ * in a siungular object to be given to the api.
+ */
+Selections.taskContent = (volself) => {
     return new Promise((resolve, reject) => {
         var hash = {};
         obtainContent(volself, hash)
@@ -260,9 +218,8 @@ Selections.addTask = (volself) => {
 };
 
 //============================== DELETE TASK ==================================
-/** Confirms task deletion.
- * Prompts user for yes no, when deleting a task is the selected action.
- * Then performs their requested operation.
+/** Deletes a task, with confirmation.
+ * Confirms with a yes or no prompt, which with permission, then deletes the task.
  */
 Selections.deleteTask = (volself, taskID) => {
     return new Promise((resolve, reject) => {
@@ -273,16 +230,13 @@ Selections.deleteTask = (volself, taskID) => {
             default: false
         }, function(result) {
             if (result.del) {
-                api.deleteTask(taskID)
-                    .then((result) => {
-                        return resolve();
-                    })
-                    .catch((error) => {
-                        return reject(error);
-                    });
-            } else {
-                return resolve();
+                return api.deleteTask(taskID);
             }
+        }).then(() => {
+            resolve();
+        })
+        .catch((error) => {
+            reject(error);
         });
     });
 };
@@ -301,45 +255,25 @@ var obtainNewOrder = (volself, task) => {
             return a.value.item_order - b.value.item_order;
         };
 
+        var globalTasks;
         api.tasks(filter)
             .then((tasks) => {
                 util.stopWaitingIndicator(listTaskIndicator);
-
-                var nodeWidth = process.stdout.columns || 80;
-                var lineWidth = Math.floor(nodeWidth * 0.55);
-
-                var tasklist = [];
-                for (var key in tasks) {
-                    var obj = {};
-                    var content = format.parseContent(lineWidth,
-                        tasks[key].content,
-                        tasks[key].indent,
-                        tasks[key].due_date_utc);
-                    obj.name = colorizer.priority[tasks[key].priority](content);
-                    obj.value = tasks[key];
-                    obj.short = tasks[key].content;
-                    tasklist.push(obj);
-                }
-
-                tasklist.sort(sort);
-
-                tasklist.unshift({
+                globalTasks = tasks;
+                var unshiftThese = [{
                     name: '<First Item>',
                     value: {
                         item_order: 0
                     },
                     short: '<First Item>'
-                });
-
-                volself.prompt({
-                    type: 'list',
-                    name: 'task',
-                    message: 'Move task after which task?',
-                    choices: tasklist
-                }, function(result) {
-                    return resolve({
-                        tasks: tasks,
-                        newOrder: result.task.item_order
+                }];
+                return format.taskList(tasks, sort, unshiftThese, null);
+            })
+            .then((tasklist) => {
+                return promptUser(volself,tasklist, tasklist[0], 'Move task after which task?', function(result) {
+                    resolve({
+                        tasks: globalTasks,
+                        newOrder: result.selected.item_order
                     });
                 });
             })
@@ -427,14 +361,8 @@ var getIndentLevel = (volself) => {
             short: 'Three times'
         }];
 
-        volself.prompt({
-            type: 'list',
-            name: 'level',
-            message: 'Indent how much?',
-            choices: options,
-            default: options[0]
-        }, function(result) {
-            resolve(result.level);
+        return promptUser(volself,options, options[0], 'Indent how much?', function(result) {
+            resolve(result.selected);
         });
     });
 };

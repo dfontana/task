@@ -109,7 +109,7 @@ vorpal
     .action(function(args, cb) {
         var volself = this;
 
-        select.addTask(volself)
+        select.taskContent(volself)
             .then((answers) => {
                 api.addTask(answers.project.id,
                         answers.date,

@@ -32,9 +32,9 @@ Task is built using the Vorpal.JS library, which takes advantage of other Javasc
 - [ ] After adjusting indentation, tasks are displayed before the server finishes updating the indentation
 - [ ] The first item in a list can have it's indentation set (whereas the web client does not allow this)
 - [ ] Error not handled properly on internet loss (crashes)
+- [ ] Reordering a task with subtasks does not move the whole group.
 
 ### Refactoring Goals
-- [ ] Remove the need to import inq just to make a seperator
 - [ ] Reduce number of times you establish prompt content and call volself.prompt
 - [ ] Reduce duplication inside the API
 
