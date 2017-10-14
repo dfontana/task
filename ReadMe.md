@@ -5,6 +5,18 @@ Welcome to task, a simple Node.JS command line interface for Todoist. Task aims 
 
 Task is built using the Vorpal.JS library, which takes advantage of other Javascript libraries such as Inquierer.js and Chalk. I also take advantage of Requests to interact with the Todoist API.
 
+## Setup
+1. Clone this repo
+2. Run an `npm install`
+3. Define the file `.task.json`. Inside is a simple JSON object with your TodoistAPI token. Here's a made up example:
+```JSON
+{
+  "token": "sjdhfurhflksjdlfjsdfsdjhg23"
+}
+```
+4. Now you should be able to run `node src/main.js`
+5. For a list of commands you can run, type `help` after starting the application
+
 ## What's Left?
 ### Commands
 - [x] List
